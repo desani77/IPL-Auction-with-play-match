@@ -70,7 +70,30 @@ body{background:radial-gradient(ellipse at 50% -10%,rgba(255,255,255,.14),transp
 .ipl-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 0 rgba(34,197,94,.7);animation:iplpulse 1.6s infinite}
 @keyframes iplpulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.7)}70%{box-shadow:0 0 0 7px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
 @media(prefers-reduced-motion:reduce){.ipl-dot{animation:none}}
-</style></head>
+</style><style id="daylight-cricket-pro">
+/* ===== Daylight Cricket Pro (v1.2.2) — additive theme, selected via [data-theme=day] ===== */
+[data-theme=day]{--bg1:#F1F5F9;--bg2:#E2E8F0;--card:#FFFFFF;--card2:#F8FAFC;--acc:#059669;--acc2:#047857;--sky:#0284C7;--gold:#D97706}
+[data-theme=day] body,[data-theme=day] #root{background:#F1F5F9;color:#0F172A}
+[data-theme=day] h1,[data-theme=day] h2,[data-theme=day] h3,[data-theme=day] .hd{font-family:Inter,system-ui,sans-serif;letter-spacing:0;text-transform:none;font-weight:800;color:#047857}
+[data-theme=day] .bg-slate-900,[data-theme=day] .bg-slate-800{background:#fff!important;border:1px solid #E2E8F0;border-radius:12px;box-shadow:0 4px 6px -1px rgba(15,23,42,.10),0 2px 4px -2px rgba(15,23,42,.08);color:#0F172A}
+[data-theme=day] .bg-slate-700{background:#F1F5F9!important;color:#0F172A;border:1px solid #E2E8F0}
+[data-theme=day] .metal{background:#fff!important;color:#0F172A;border:1px solid #E2E8F0;border-radius:999px}
+[data-theme=day] .space-y-1>div:nth-child(even){background:#F8FAFC}
+[data-theme=day] .text-white,[data-theme=day] .text-slate-100,[data-theme=day] .text-slate-200{color:#0F172A!important}
+[data-theme=day] .text-slate-300,[data-theme=day] .text-slate-400,[data-theme=day] .text-slate-500{color:#475569!important}
+[data-theme=day] .text-amber-300,[data-theme=day] .text-yellow-300,[data-theme=day] .text-yellow-400{color:#B45309!important}
+[data-theme=day] .bg-red-600,[data-theme=day] .bg-red-600 *,[data-theme=day] .bg-emerald-600,[data-theme=day] .bg-emerald-600 *,[data-theme=day] .bg-sky-600,[data-theme=day] .bg-sky-600 *,[data-theme=day] .bg-blue-600,[data-theme=day] .bg-blue-600 *,[data-theme=day] .bg-green-600,[data-theme=day] .bg-green-600 *{color:#fff!important}
+[data-theme=day] input,[data-theme=day] select,[data-theme=day] textarea{background:#fff!important;color:#0F172A!important;border:1px solid #CBD5E1}
+[data-theme=day] .cred{color:#047857;background:#ECFDF5;border-color:#A7F3D0}
+/* ball badges: 0/1 neutral, 4 sky blue, 6 emerald, W crimson */
+.ball-badge{display:inline-flex;align-items:center;justify-content:center;width:1.75rem;height:1.75rem;border-radius:9999px;font-weight:800;font-size:.8rem;background:#E2E8F0;color:#0F172A;border:1px solid #CBD5E1}
+.ball-badge.b4{background:#0284C7;color:#fff;border-color:#0284C7}
+.ball-badge.b6{background:#059669;color:#fff;border-color:#059669}
+.ball-badge.bW{background:#DC2626;color:#fff;border-color:#DC2626}
+/* hardware layer isolation: stable 60fps, no flash on score updates */
+[data-theme=day] .metal,[data-theme=day] .bg-slate-900,[data-theme=day] .bg-slate-800,.ball-badge{backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:translate3d(0,0,0);will-change:opacity,transform}
+</style>
+</head>
 <body class="overflow-x-hidden max-w-full w-full"><div id="root" class="overflow-x-hidden max-w-full w-full"></div><script>window.addEventListener('error',function(e){var r=document.getElementById('root');if(r&&!r.children.length)r.innerHTML='<div style="padding:16px;margin:16px;background:#7f1d1d;color:#fff;border-radius:12px;font-family:system-ui"><b>Load error</b><br>'+String(e.message||'A script failed to load (check your internet connection) and reload.')+'</div>'},true);setTimeout(function(){var r=document.getElementById('root');if(r&&!r.children.length)r.innerHTML='<div style="padding:16px;margin:16px;background:#7f1d1d;color:#fff;border-radius:12px;font-family:system-ui"><b>The game did not start.</b><br>A script may have failed to load. Check your connection and reload.</div>'},8000)</script>
 
 <script type="text/babel">
@@ -246,7 +269,7 @@ function testNext(g,m){const t=(m.tb||0)>=2700,k=m.inn,[I0,I1,I2]=m.ins;
   if(done2&&(m.fol?tTot(m,Y)<I0.r:tTot(m,X)<I1.r)){finish(g,m);return}
   m.inn=3;m.ins.push(ni(m,ch,ot,tTot(m,ot)-prior+1));m.op={go:0};return}
  finish(g,m)}
-function stepDown(){setTimeout(()=>{if(!HOST||!G||!G.xf)return;const code=G.code;HOST=false;LOST=false;try{PEER&&PEER.destroy()}catch(e){}CONNS=[];CONN=null;join(code);rr()},1200)}
+function stepDown(){setTimeout(()=>{if(EXITING||!HOST||!G||!G.xf)return;const code=G.code;HOST=false;LOST=false;try{PEER&&PEER.destroy()}catch(e){}CONNS=[];CONN=null;join(code);rr()},1200)}
 function kick(t){if(!HOST||!G)return;const T=G.teams[t],id=T&&T.h;if(!id||(PEER&&id===PEER.id))return;const c=CONNS.find(x=>x.peer===id);try{c&&c.open&&c.send({k:'KICKED'})}catch(e){}T.h=null;T.controller='npc';T.peerId=null;CONNS=CONNS.filter(x=>x!==c);setTimeout(()=>{try{c&&c.close()}catch(e){}},500);pub()}
 function prT(T,i){return T.pr&&T.pr[i]!=null?+T.pr[i]:+price(i).toFixed(2)}
 function mrCalc(g,T,ids){const R=g.sr||{mr:4,top:40};let pu=Math.min(120,T.purse+R.top),keep=[],o=0,pr={};[...new Set(ids)].filter(i=>T.sq.includes(i)&&i<1000).forEach(i=>{const c=prT(T,i);if(keep.length<R.mr&&pu-c>=8){if(pl(i).o==='O'){if(o>=8)return;o++}pu=+(pu-c).toFixed(2);pr[i]=c;keep.push(i)}});return{keep,purse:+pu.toFixed(2),pr}}
@@ -370,7 +393,7 @@ function apply(g,a){const m=fm(g,a.mid);if(m&&m.op&&!m.op.go&&['dl','run','bowl'
  case'hdec':{const isV=s=>s&&(g.vt||[]).some(v=>g.teams[v]&&g.teams[v].h===s);if(!a.src||isV(a.src))g.hq=null;break}
  case'reclaim':{const t=g.oh;if(a.src&&t&&g.teams[t]&&g.teams[t].h===a.src&&!(PEER&&g.teams[t].h===PEER.id)){g.vt=(g.vt||[]).filter(x=>x!==t).concat(t);g.xf=t;g.hq=null;stepDown()}break}
  case'xfer':{const isV=s=>s&&(g.vt||[]).some(v=>g.teams[v]&&g.teams[v].h===s);if(!a.src||isV(a.src)){const tt=a.t||(g.hq&&g.hq.t);if(tt&&g.teams[tt]&&g.teams[tt].h&&!(PEER&&g.teams[tt].h===PEER.id)){g.vt=(g.vt||[]).filter(x=>x!==tt).concat(tt);g.xf=tt;g.hq=null;stepDown()}}break}}}
-const SK='ipl_saved_rooms_';let LOST=false,HERR=0,SVT=0;
+const SK='ipl_saved_rooms_';let LOST=false,HERR=0,SVT=0,EXITING=false;
 /* ================= FAILOVER: backup, co-host hierarchy, watchdog ================= */
 const DPID=(()=>{try{let i=localStorage.getItem('ipl_dpid');if(!i){i=Math.random().toString(36).slice(2)+Date.now().toString(36);localStorage.setItem('ipl_dpid',i)}return i}catch(e){return 'x'+Math.random().toString(36).slice(2)}})();
 let LRX=Date.now(),LTRY=0,FOINIT=0;
@@ -380,7 +403,7 @@ function autoCo(g){const me=PEER&&PEER.id,lv=g.lv||[];g.co=(g.co||[]).filter(t=>
  AT(g).forEach(t=>{if(g.co.length>=3||t===ME)return;const h=g.teams[t].h;if(h&&h!==me&&lv.includes(h)&&!g.co.includes(t)&&!(g.vt||[]).includes(t))g.co.push(t)});
  if(!g.oh&&ME&&g.teams[ME])g.oh=ME;g.cp=coOrder(g).map(t=>g.teams[t].h)}
 /* continuous localStorage backup: role, room, manager, franchise (engine data goes via saveRoom) */
-function bk(){try{if(!G||!G.code)return;localStorage.setItem('ipl_bk',JSON.stringify({roomCode:G.code,isHost:!!HOST,managerName:(localStorage.getItem('ipl_mgr')||'').trim(),franchiseId:ME||null,co:G.cp||[],ph:G.ph,ts:Date.now()}))}catch(e){}}
+function bk(){try{if(EXITING||!G||!G.code)return;localStorage.setItem('ipl_bk',JSON.stringify({roomCode:G.code,isHost:!!HOST,managerName:(localStorage.getItem('ipl_mgr')||'').trim(),franchiseId:ME||null,co:G.cp||[],ph:G.ph,ts:Date.now()}))}catch(e){}}
 function readBk(){try{const b=JSON.parse(localStorage.getItem('ipl_bk')||'null');return b&&b.roomCode&&Date.now()-b.ts<43200000?b:null}catch(e){return null}}
 if(!FOINIT){FOINIT=1;
  /* host heartbeat every 2s so idle phases never look dead */
@@ -393,7 +416,7 @@ if(!FOINIT){FOINIT=1;
 }
 
 const LIVE=()=>CONNS.filter(c=>c.open).map(c=>c.peer).concat(PEER&&PEER.id?[PEER.id]:[]);
-function saveRoom(g,me){try{const x={...g};delete x.lv;const t=me||ME||null,role=HOST?'host':'player';if(!HOST&&t)localStorage.setItem('ipl_last_'+g.code,t);localStorage.setItem(SK+g.code,JSON.stringify({g:x,me:t,myTeam:t,myRole:role,roomCode:g.code,hostPeerId:'ipl26-'+g.code,ts:Date.now()}));try{IX.touch()}catch(e){}}catch(e){}}
+function saveRoom(g,me){if(EXITING)return;try{const x={...g};delete x.lv;const t=me||ME||null,role=HOST?'host':'player';if(!HOST&&t)localStorage.setItem('ipl_last_'+g.code,t);localStorage.setItem(SK+g.code,JSON.stringify({g:x,me:t,myTeam:t,myRole:role,roomCode:g.code,hostPeerId:'ipl26-'+g.code,ts:Date.now()}));try{IX.touch()}catch(e){}}catch(e){}}
 function savedRooms(){const o=[];try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(SK)){try{const r=JSON.parse(localStorage.getItem(k));if(r&&r.g)o.push(r)}catch(e){}}}}catch(e){}return o.sort((a,b)=>(b.ts||0)-(a.ts||0))}
 const prog=g=>g.ph==='lobby'?'Lobby':g.ph==='ptr'||g.ph==='qtr'?'Trade window':g.ph==='ret'||g.ph==='mret'?'Retentions':g.ph==='au'?'Auction in progress':g.ph==='mode'||g.ph==='fix'?'Setup':g.ph==='pcust'?'Playoffs setup':g.ph==='done'?'🏆 '+g.ch+' champions':g.po&&g.po.length?'Playoffs':'League '+(g.fix?g.fix.filter(f=>f[4]).length:0)+'/'+(g.fix?g.fix.length:0);
 function pub(){if(HOST){G.lv=LIVE();try{autoCo(G);if(ME&&G.teams&&G.teams[ME]){const u=IX.myUid();if(u)G.teams[ME].u=u}}catch(e){}IX.save();IX.bc();bk()}rr()}
@@ -401,7 +424,7 @@ const dispatch=a=>{if(HOST){try{apply(G,a)}catch(e){console.error(e)}pub()}else 
 function tick(){if(TK)return;TK=1;
  setInterval(()=>{if(HOST&&G&&G.ph==='au'&&!G.au.ps){try{auTick(G)}catch(e){console.error(e)}pub()}},1000);
  setInterval(()=>{if(HOST&&G&&G.ph==='hub'&&G.ms&&G.ms.length){let c=0;[...G.ms].forEach(m=>{if(!m.done&&!m.mp){try{c|=step(G,m,0)}catch(e){console.error(e)}}});if(c)pub()}},700)}
-function startHost(g,me,n=0){HOST=true;LOST=false;G=g;try{migrate(g)}catch(e){}g.ms=g.ms||[];g.dn=g.dn||[];g.season=g.season||2026;RCg(g);if(g.ph==='lg')g.ph='hub';if(me)ME=me;if(!g.oh&&ME&&g.teams[ME])g.oh=ME;try{PEER&&PEER.destroy()}catch(e){}CONNS=[];CONN=null;localStorage.setItem('ipl_host',g.code);localStorage.removeItem('ipl_join');
+function startHost(g,me,n=0){if(EXITING)return;HOST=true;LOST=false;G=g;try{migrate(g)}catch(e){}g.ms=g.ms||[];g.dn=g.dn||[];g.season=g.season||2026;RCg(g);if(g.ph==='lg')g.ph='hub';if(me)ME=me;if(!g.oh&&ME&&g.teams[ME])g.oh=ME;try{PEER&&PEER.destroy()}catch(e){}CONNS=[];CONN=null;localStorage.setItem('ipl_host',g.code);localStorage.removeItem('ipl_join');
  PEER=new Peer('ipl26-'+g.code);
  PEER.on('connection',c=>{CONNS.push(c);c.on('open',()=>{G.lv=LIVE();c.send({g:G})});c.on('data',d=>{if(d&&d.k)dispatch({...d,src:c.peer})});c.on('close',()=>{CONNS=CONNS.filter(x=>x!==c);pub()})});
  PEER.on('open',()=>{HERR=0;AT(g).forEach(t=>{if(g.teams[t].h===PEER.id&&t!==ME)g.teams[t].h=null});if(ME&&g.teams[ME]){const h=g.teams[ME].h;if(!h||h===PEER.id||!LIVE().includes(h))g.teams[ME].h=PEER.id}pub()});
@@ -430,20 +453,56 @@ function conn(code){if(HOST||!PEER||(CONN&&CONN.open))return;let c;try{c=PEER.co
  c.on('data',d=>{LRX=Date.now();if(d&&d.k==='HOST_BYE'){LOST=true;LTRY++;rr();try{c.close()}catch(e){}return}if(d&&d.k==='KICKED'){try{localStorage.removeItem('ipl_last_'+(G&&G.code));localStorage.removeItem(SK+(G&&G.code))}catch(e){}alert('You were removed from the room by the Host');home();return}if(d&&d.k==='ROOM_DISBANDED'){alert('The Host has closed the room');home();return}if(d&&d.g){G=d.g;LOST=false;if(Date.now()-SVT>3000){SVT=Date.now();saveRoom(G,ME)}bk();rr()}});
  c.on('open',()=>{LOST=false;LRX=Date.now();if(ME)c.send({k:'claim',t:ME,id:PEER.id,pid:DPID,u:IX.myUid()});rr()});
  const lost=()=>{if(CONN!==c||HOST)return;LOST=true;LTRY++;rr();setTimeout(()=>{if(!HOST&&CONN===c&&!c.open)retry(code)},3000)};c.on('close',lost);c.on('error',lost)}
-function retry(code){if(HOST)return;if(!PEER||PEER.destroyed||PEER.disconnected){try{PEER&&PEER.destroy()}catch(e){}PEER=new Peer();PEER.on('open',()=>conn(code));PEER.on('error',onPE(code))}else conn(code)}
-function join(code){HOST=false;localStorage.setItem('ipl_join',code);localStorage.removeItem('ipl_host');ME=localStorage.getItem('ipl_me_'+code)||ME;try{PEER&&PEER.destroy()}catch(e){}PEER=new Peer();PEER.on('open',()=>conn(code));PEER.on('error',onPE(code))}
-function resume(code){try{const r=JSON.parse(localStorage.getItem(SK+code));if(!r||!r.g)return;startHost(r.g,r.me||localStorage.getItem('ipl_me_'+code)||null)}catch(e){console.error(e)}}
+function retry(code){if(HOST||EXITING)return;if(!PEER||PEER.destroyed||PEER.disconnected){try{PEER&&PEER.destroy()}catch(e){}PEER=new Peer();PEER.on('open',()=>conn(code));PEER.on('error',onPE(code))}else conn(code)}
+function join(code){if(EXITING)return;HOST=false;localStorage.setItem('ipl_join',code);localStorage.removeItem('ipl_host');ME=localStorage.getItem('ipl_me_'+code)||ME;try{PEER&&PEER.destroy()}catch(e){}PEER=new Peer();PEER.on('open',()=>conn(code));PEER.on('error',onPE(code))}
+function resume(code){if(EXITING)return;try{const r=JSON.parse(localStorage.getItem(SK+code));if(!r||!r.g)return;startHost(r.g,r.me||localStorage.getItem('ipl_me_'+code)||null)}catch(e){console.error(e)}}
 function rejoin(code,team){if(team){ME=team;try{localStorage.setItem('ipl_me_'+code,team);localStorage.setItem('ipl_me',team)}catch(e){}}join(code);rr()}
 function probeHost(code,cb){let done=0,p;const fin=v=>{if(done)return;done=1;try{p&&p.destroy()}catch(e){}cb(v)};try{p=new Peer();p.on('open',()=>{const c=p.connect('ipl26-'+code);c.on('open',()=>fin(true));setTimeout(()=>fin(undefined),8000)});p.on('error',e=>fin(e.type==='peer-unavailable'?false:undefined))}catch(e){cb(undefined)}}
-function boot(){const q=(new URLSearchParams(location.search).get('room')||'').toUpperCase();let sh=localStorage.getItem('ipl_host'),sj=localStorage.getItem('ipl_join');const B=readBk();
+function boot(){if(EXITING)return;const q=(new URLSearchParams(location.search).get('room')||'').toUpperCase();let sh=localStorage.getItem('ipl_host'),sj=localStorage.getItem('ipl_join');const B=readBk();
  if(!q&&!sh&&!sj&&B){if(B.isHost)sh=B.roomCode;else sj=B.roomCode}
  if(B&&B.franchiseId&&!ME)ME=B.franchiseId;
  if(q&&q!==sh)join(q);else if(sh){try{const r=JSON.parse(localStorage.getItem(SK+sh));if(r&&r.g){const me=r.me||(B&&B.franchiseId)||ME;G=r.g;ME=me;LOST=true;try{rr()}catch(e){}
   probeHost(sh,v=>{if(v===true){try{localStorage.setItem('ipl_me_'+sh,me||'')}catch(e){}join(sh);try{rr()}catch(e){}}else startHost(r.g,me)})}else localStorage.removeItem('ipl_host')}catch(e){}}else if(sj){if(B&&B.roomCode===sj&&B.franchiseId)try{localStorage.setItem('ipl_me_'+sj,localStorage.getItem('ipl_me_'+sj)||B.franchiseId)}catch(e){}join(sj)}}
 const wipe=()=>{try{const keep=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(/^(ipl_dpid|ipl_friends|ipl_th|ipl_mute|ipl_saved_rooms_|ipl_last_|ipl_acct|ipl_acc_|ipl_gm_|ipl_vc)/.test(k))keep.push([k,localStorage.getItem(k)])}localStorage.clear();keep.forEach(([k,v])=>localStorage.setItem(k,v))}catch(e){}};
-const home=()=>{wipe();try{PEER&&PEER.destroy()}catch(e){}location.href=location.pathname};
-const leaveRoom=()=>{try{if(CONN&&CONN.open&&PEER)CONN.send({k:'leave',id:PEER.id})}catch(e){}setTimeout(home,250)};
-const disband=()=>{CONNS.forEach(c=>{try{c.open&&c.send({k:'ROOM_DISBANDED'})}catch(e){}});setTimeout(()=>{alert('Room closed. Progress is saved - resume it from the Home screen.');home()},450)};
+/* ===== EXIT ROUTING: one strict, idempotent sequence used by every exit path ===== */
+const purgeRoomSession=()=>{
+ /* a) kill the network layer so no listener can re-open the room */
+ try{CONNS.forEach(c=>{try{c.close()}catch(e){}})}catch(e){}
+ try{CONN&&CONN.close()}catch(e){}
+ try{PEER&&PEER.removeAllListeners&&PEER.removeAllListeners()}catch(e){}
+ try{PEER&&!PEER.disconnected&&PEER.disconnect()}catch(e){}
+ try{PEER&&!PEER.destroyed&&PEER.destroy()}catch(e){}
+ try{LB&&LB.kill&&LB.kill()}catch(e){}try{typeof lbKill==='function'&&lbKill()}catch(e){}
+ PEER=null;CONN=null;CONNS=[];
+ /* b) reset runtime state (currentRoomCode == G.code, isUserRoomHost == HOST) */
+ G=null;ME=null;HOST=false;LOST=false;LTRY=0;HERR=0;
+ /* c) remove every persisted room marker (saved tournaments are kept so they can be resumed from Home) */
+ try{['ipl_bk','ipl_host','ipl_join','ipl_me','IPL_SIM_ACTIVE_ROOM_CODE'].forEach(k=>localStorage.removeItem(k));
+  Object.keys(localStorage).filter(k=>k.indexOf('ipl_me_')===0).forEach(k=>localStorage.removeItem(k))}catch(e){}
+ try{sessionStorage.removeItem('ipl_pg')}catch(e){}
+};
+const showHomeViewport=()=>{
+ /* UI: re-show home, hide every overlay (no-ops when an id/class is absent) */
+ try{const h=document.getElementById('game-homepage-viewport');h&&h.classList.remove('hidden')}catch(e){}
+ try{['match-simulation-container','tournament-wizard-viewport','player-management-dock'].forEach(id=>{const el=document.getElementById(id);if(el){el.classList.add('hidden');el.style.display='none'}})}catch(e){}
+ try{rr()}catch(e){}
+};
+let EXIT_RUN=false;
+const executeSafeAppExitSequence=()=>{
+ if(EXIT_RUN)return;EXIT_RUN=true;
+ /* freeze persistence FIRST so pagehide/pub()/watchdogs cannot rewrite ipl_bk or re-open the room */
+ try{if(HOST&&G)saveRoom(G,ME)}catch(e){}   /* keep host progress for "Resume" on Home */
+ EXITING=true;
+ purgeRoomSession();
+ wipe();
+ showHomeViewport();
+ /* hard navigation drops ?room= and guarantees a fresh boot with no room state */
+ try{location.replace(location.pathname)}catch(e){location.href=location.pathname}
+};
+const home=executeSafeAppExitSequence;
+const exitRoom=executeSafeAppExitSequence;
+const leaveRoom=()=>{try{if(CONN&&CONN.open&&PEER)CONN.send({k:'leave',id:PEER.id})}catch(e){}EXITING=true;setTimeout(executeSafeAppExitSequence,250)};
+const disband=()=>{try{if(G)saveRoom(G,ME)}catch(e){}CONNS.forEach(c=>{try{c.open&&c.send({k:'ROOM_DISBANDED'})}catch(e){}});setTimeout(()=>{alert('Room closed. Progress is saved - resume it from the Home screen.');executeSafeAppExitSequence()},450)};
 
 function summ(m){const[A,B]=m.ins,tb=[],tw=[];m.ins.forEach(I=>{Object.entries(I.bs).forEach(([i,s])=>tb.push([i,s.r,s.b]));Object.entries(I.bl).forEach(([i,s])=>tw.push([i,s.w,s.r]))});tb.sort((a,b)=>b[1]-a[1]);tw.sort((a,b)=>b[1]-a[1]||a[2]-b[2]);return`🏏 IPL: ${m.a} vs ${m.b}\n${A.bt} ${A.r}/${A.w} (${ov(A.b)})\n${B.bt} ${B.r}/${B.w} (${ov(B.b)})\n🏆 ${m.msg}\n⭐ Man of the Match: ${m.mom?pl(m.mom.i).n:'-'}\n🔝 Bat: ${tb[0]?pl(+tb[0][0]).n+' '+tb[0][1]+'('+tb[0][2]+')':'-'}\n🎯 Bowl: ${tw[0]?pl(+tw[0][0]).n+' '+tw[0][1]+'/'+tw[0][2]:'-'}${m.tp?'\n🔄 Turning point: '+m.tp.t:''}`}
 function AW({g}){const all=[];AT(g).forEach(t=>Object.entries(g.teams[t].pr||{}).forEach(([i,p])=>all.push({i:+i,t,p})));const mvp=i=>(g.mv||{})[i]||0,ex=[...all].sort((a,b)=>b.p-a.p)[0],st=[...all].filter(x=>mvp(x.i)>0).sort((a,b)=>mvp(b.i)/Math.max(.2,b.p)-mvp(a.i)/Math.max(.2,a.p))[0],em=EMS.map(n=>P.findIndex(p=>p.n===n)).filter(i=>i>=0).sort((a,b)=>mvp(b)-mvp(a))[0];const C=(h,x)=><div key={h} className="rounded p-2 border" style={{borderColor:'var(--acc)'}}><b className="hd" style={{color:'var(--acc)'}}>{h}</b><div>{TDn(x)}</div></div>;return<div className="space-y-1">{C('🌟 Emerging Player',em!=null&&mvp(em)>0?pl(em).n+' · '+Math.round(mvp(em))+' pts':'—')}{C('💎 Most Expensive Buy',ex?pl(ex.i).n+' · '+ex.t+' ₹'+ex.p.toFixed(2)+' Cr · '+Math.round(mvp(ex.i))+' pts':'—')}{C('🕵️ Auction Steal',st?pl(st.i).n+' · '+st.t+' ₹'+st.p.toFixed(2)+' Cr · '+(mvp(st.i)/Math.max(.2,st.p)).toFixed(1)+' pts/Cr':'—')}</div>}
@@ -547,7 +606,7 @@ function FixList({g,edit}){const T=AT(g),VS=[...new Set(Object.values(VN))],S='b
 
 function App(){
  const[,N]=useState(0);rr=IX.mkRR(N);
- const[fxs,setFx]=useState(null),[mm,setMm]=useState(false),[wz,setWz]=useState(''),[qk,setQk]=useState('single'),[pg,setPgS]=useState(()=>{try{return sessionStorage.getItem('ipl_pg')||'hub'}catch(e){return'hub'}}),[md,setMd]=useState(null),[code,setCode]=useState(''),[np,setNp]=useState(4),[pubR,setPubR]=useState(true),[qmo,setQmo]=useState(false),[qa,setQa]=useState('CSK'),[qb,setQb]=useState('MI'),[qn,setQn]=useState(1),[cfR,setCfR]=useState(false),[qf,setQf]=useState('T20'),[gm,setGm]=useState(()=>{try{return localStorage.getItem('ipl_seen_version')!==APP_VERSION?'new':null}catch(e){return null}}),[mgr,setMgr]=useState(()=>{try{return localStorage.getItem('ipl_mgr')||''}catch(e){return ''}}),[sel,setSel]=useState(TN.slice(0,4)),[sqT,setSqT]=useState(null),[rs,setRs]=useState([]),[xs,setXs]=useState(null),[ops,setOps]=useState(null),[ip,setIp]=useState({o:'',i:''}),[th,setTh]=useState(['aaa','ipl','neon','vip','ice','espn','sonyliv','fut'].includes(localStorage.getItem('ipl_th'))?localStorage.getItem('ipl_th'):'aaa'),[xo,setXo]=useState(false),[mu,setMu]=useState(MUTE),[vm,setVm]=useState(null),[pm,setPm]=useState(null),[rc,setRc]=useState(false),[rsel,setRsel]=useState(null),[rtab,setRtab]=useState('tm'),[sr,setSr]=useState({mr:4,rtm:2,top:40}),[svn,setSvn]=useState(0),[nsp,setNsp]=useState(false);
+ const[fxs,setFx]=useState(null),[mm,setMm]=useState(false),[wz,setWz]=useState(''),[qk,setQk]=useState('single'),[pg,setPgS]=useState(()=>{try{return sessionStorage.getItem('ipl_pg')||'hub'}catch(e){return'hub'}}),[md,setMd]=useState(null),[code,setCode]=useState(''),[np,setNp]=useState(4),[pubR,setPubR]=useState(true),[qmo,setQmo]=useState(false),[qa,setQa]=useState('CSK'),[qb,setQb]=useState('MI'),[qn,setQn]=useState(1),[cfR,setCfR]=useState(false),[qf,setQf]=useState('T20'),[gm,setGm]=useState(()=>{try{return localStorage.getItem('ipl_seen_version')!==APP_VERSION?'new':null}catch(e){return null}}),[mgr,setMgr]=useState(()=>{try{return localStorage.getItem('ipl_mgr')||''}catch(e){return ''}}),[sel,setSel]=useState(TN.slice(0,4)),[sqT,setSqT]=useState(null),[rs,setRs]=useState([]),[xs,setXs]=useState(null),[ops,setOps]=useState(null),[ip,setIp]=useState({o:'',i:''}),[th,setTh]=useState(['aaa','ipl','neon','vip','ice','espn','sonyliv','fut','day'].includes(localStorage.getItem('ipl_th'))?localStorage.getItem('ipl_th'):'day'),[xo,setXo]=useState(false),[mu,setMu]=useState(MUTE),[vm,setVm]=useState(null),[pm,setPm]=useState(null),[rc,setRc]=useState(false),[rsel,setRsel]=useState(null),[rtab,setRtab]=useState('tm'),[sr,setSr]=useState({mr:4,rtm:2,top:40}),[svn,setSvn]=useState(0),[nsp,setNsp]=useState(false);
  const M=G&&vm?fm(G,vm):null;const vmR=useRef(null);vmR.current=vm;
  useEffect(()=>{boot();let wl=null,vid=null,hb=null;const fb=()=>{if(vid)return;try{const cv=document.createElement('canvas');cv.width=cv.height=2;const cx=cv.getContext('2d'),dr=()=>{cx.fillStyle='rgb('+(Math.random()*255|0)+',0,0)';cx.fillRect(0,0,2,2)};dr();const st=cv.captureStream?cv.captureStream(5):null;if(!st)return;vid=document.createElement('video');vid.setAttribute('playsinline','');vid.muted=true;vid.loop=true;vid.srcObject=st;vid.style.cssText='position:fixed;left:0;bottom:0;width:1px;height:1px;opacity:.01;pointer-events:none';document.body.appendChild(vid);vid.play().catch(()=>{});hb=setInterval(()=>{dr();if(vid.paused)vid.play().catch(()=>{})},1000)}catch(e){}};const ask=async()=>{try{if(navigator.wakeLock){if(document.visibilityState==='visible'&&(!wl||wl.released)){const l=await navigator.wakeLock.request('screen');wl=l;l.addEventListener('release',()=>{if(wl===l)wl=null;setTimeout(ask,300)})}}else{fb();if(vid&&vid.paused)vid.play().catch(()=>{})}}catch(e){fb()}};ask();const vc=()=>{if(document.visibilityState==='visible')ask()},iv=setInterval(ask,10000),evs=['pointerdown','touchstart','click','keydown','focus'];document.addEventListener('visibilitychange',vc);evs.forEach(n=>window.addEventListener(n,ask,{passive:true}));return()=>{document.removeEventListener('visibilitychange',vc);evs.forEach(n=>window.removeEventListener(n,ask));clearInterval(iv);if(hb)clearInterval(hb);try{wl&&wl.release()}catch(e){}if(vid)vid.remove()}},[]);
  const seen=useRef(null),k=G&&G.fx&&G.fx.k;
@@ -576,7 +635,7 @@ function App(){
    <div className="flex flex-wrap items-center justify-end gap-2 ml-auto max-w-full"><Pb onClick={()=>setGm('new')}>✨ {APP_VERSION} What's New</Pb><Pb onClick={()=>{if(window.__dip&&!isSA())installNow();else setGm('inst')}}>{isSA()?'✅ Installed':'📲 Install App'}</Pb>{G&&ME&&(G.ph==='lg'||G.ph==='hub')&&!G.qm&&<Pb onClick={()=>setMd('qmx')}>⚡ Quick Match</Pb>}{G&&ME&&<Pb onClick={()=>setMd('cust')}>✏️ Team</Pb>}{G&&<InviteBtn code={G.code}/>}<Pb onClick={()=>{MUTE=!MUTE;try{localStorage.setItem('ipl_mute',MUTE?'1':'0')}catch(e){}setMu(MUTE)}}>{mu?'🔇':'🔊'}</Pb><button onClick={()=>setXo(true)} className="exit shrink-0 text-[10px] px-2 py-1 sm:text-xs sm:px-3 sm:py-1.5 rounded-lg font-bold bg-red-600 text-white relative z-50 pointer-events-auto active:scale-95">× Exit</button></div>
   </div>
   {!G&&<HomeMeta/>}
-  {G&&<div className="flex flex-wrap items-center gap-1.5 mt-1.5"><button onClick={()=>setMm(!mm)} className="shrink-0 whitespace-nowrap text-[11px] px-3 py-1.5 sm:text-xs rounded-lg font-bold bg-amber-500 text-black active:scale-95">⚙️ Match Menu {mm?'▲':'▼'}</button><VoiceBar/></div>}<div onClick={e=>{if(G&&e.target.closest&&e.target.closest('button'))setTimeout(()=>setMm(false),60)}} className={"flex flex-wrap items-center gap-1.5 mt-1.5 w-full max-w-full "+(G?(mm?"mm-open":"hidden"):"")}><select value={th} onChange={e=>setTh(e.target.value)} className="bg-slate-700 rounded-lg py-1.5 text-xs font-bold max-w-[145px] truncate shrink-0"><option value="aaa">🏆 AAA Official Console Cricket</option><option value="ipl">📺 Official IPL TV Broadcast</option><option value="neon">⚡ Neon Esports Stadium</option><option value="vip">👑 VIP Obsidian & Gold</option><option value="ice">❄️ Ice Blue & Platinum</option><option value="espn">🤍 ESPNcricinfo / Apple Sports Clean</option><option value="sonyliv">📺 Sony LIV / JioCinema Match Center</option><option value="fut">🎮 EA Sports FC Ultimate Team HUD</option></select>{G&&G.ph!=='lobby'&&<Pb onClick={()=>setMd('tb')}>Tables</Pb>}{G&&G.fix&&G.fix.length>0&&<Pb onClick={()=>setMd('fx')}>Fixtures</Pb>}{G&&G.ph!=='lobby'&&<Pb onClick={()=>setMd('sq')}>Squads</Pb>}{G&&G.ph==='au'&&<Pb onClick={()=>setMd('set')}>Sets</Pb>}{M&&<Pb onClick={()=>setMd('sc')}>📊 Scorecard</Pb>}{G&&G.ph==='hub'&&((G.ms||[]).length>0||vm)&&<Pb c="bg-red-700" onClick={()=>setMd('live')}>📺 Live Matches ({(G.ms||[]).filter(x=>!x.done).length})</Pb>}{HOST&&G&&<Pb onClick={()=>setMd('room')}>👥 Players</Pb>}{(HOST||isVice)&&G&&<Pb onClick={()=>dispatch({k:'pubset',v:!G.pub,t:HOST?undefined:ME})}>{G.pub?'🌍 Public':'🔒 Private'}</Pb>}{!HOST&&holds&&!isVice&&G&&<Pb onClick={()=>dispatch({k:'hreq',t:ME})}>🙋 Request Host</Pb>}{G&&vm&&<Pb onClick={()=>setVm(null)}>🏠 Hub</Pb>}{G&&G.ph!=='lobby'&&<Pb onClick={()=>setRc(true)}>📊 Records</Pb>}</div></div>;
+  {G&&<div className="flex flex-wrap items-center gap-1.5 mt-1.5"><button onClick={()=>setMm(!mm)} className="shrink-0 whitespace-nowrap text-[11px] px-3 py-1.5 sm:text-xs rounded-lg font-bold bg-amber-500 text-black active:scale-95">⚙️ Match Menu {mm?'▲':'▼'}</button><VoiceBar/></div>}<div onClick={e=>{if(G&&e.target.closest&&e.target.closest('button'))setTimeout(()=>setMm(false),60)}} className={"flex flex-wrap items-center gap-1.5 mt-1.5 w-full max-w-full "+(G?(mm?"mm-open":"hidden"):"")}><select value={th} onChange={e=>setTh(e.target.value)} className="bg-slate-700 rounded-lg py-1.5 text-xs font-bold max-w-[145px] truncate shrink-0"><option value="aaa">🏆 AAA Official Console Cricket</option><option value="ipl">📺 Official IPL TV Broadcast</option><option value="neon">⚡ Neon Esports Stadium</option><option value="vip">👑 VIP Obsidian & Gold</option><option value="ice">❄️ Ice Blue & Platinum</option><option value="day">☀️ Daylight Cricket Pro</option><option value="espn">🤍 ESPNcricinfo / Apple Sports Clean</option><option value="sonyliv">📺 Sony LIV / JioCinema Match Center</option><option value="fut">🎮 EA Sports FC Ultimate Team HUD</option></select>{G&&G.ph!=='lobby'&&<Pb onClick={()=>setMd('tb')}>Tables</Pb>}{G&&G.fix&&G.fix.length>0&&<Pb onClick={()=>setMd('fx')}>Fixtures</Pb>}{G&&G.ph!=='lobby'&&<Pb onClick={()=>setMd('sq')}>Squads</Pb>}{G&&G.ph==='au'&&<Pb onClick={()=>setMd('set')}>Sets</Pb>}{M&&<Pb onClick={()=>setMd('sc')}>📊 Scorecard</Pb>}{G&&G.ph==='hub'&&((G.ms||[]).length>0||vm)&&<Pb c="bg-red-700" onClick={()=>setMd('live')}>📺 Live Matches ({(G.ms||[]).filter(x=>!x.done).length})</Pb>}{HOST&&G&&<Pb onClick={()=>setMd('room')}>👥 Players</Pb>}{(HOST||isVice)&&G&&<Pb onClick={()=>dispatch({k:'pubset',v:!G.pub,t:HOST?undefined:ME})}>{G.pub?'🌍 Public':'🔒 Private'}</Pb>}{!HOST&&holds&&!isVice&&G&&<Pb onClick={()=>dispatch({k:'hreq',t:ME})}>🙋 Request Host</Pb>}{G&&vm&&<Pb onClick={()=>setVm(null)}>🏠 Hub</Pb>}{G&&G.ph!=='lobby'&&<Pb onClick={()=>setRc(true)}>📊 Records</Pb>}</div></div>;
  const free=t=>!G.teams[t].h||!(G.lv||[]).includes(G.teams[t].h);
  const [rcx,setRcx]=useState(false);const LT=(()=>{try{return G&&G.teams?localStorage.getItem('ipl_last_'+G.code):null}catch(e){return null}})();
  const Ban=G&&<>{!HOST&&LOST&&<div className="fixed top-14 left-1/2 -translate-x-1/2 z-[80] flex flex-col items-center gap-1 max-w-[92%]" style={{transition:'opacity .3s'}}><div className="pointer-events-none rounded-full px-3 py-1 text-[11px] sm:text-xs font-bold text-white bg-slate-900/90 border border-amber-400 animate-pulse">{isCo||isVice?'🔄 Host disconnected. Switching to Co-Host...':'🔄 Host disconnected. Switching to Co-Host... reconnecting'}</div>{(isCo||isVice)&&<button className="rounded-full px-3 py-0.5 text-[10px] font-bold bg-amber-400 text-black active:scale-95" onClick={()=>{G.xf=null;startHost(G,ME)}}>🛡️ Take over now</button>}</div>}{!HOST&&holds&&G&&G.oh===ME&&!LOST&&<div className="bg-amber-900/70 text-amber-100 text-[11px] px-2 py-1 text-center">✅ You rejoined as Co-Host. <button className="underline font-bold" onClick={()=>dispatch({k:'reclaim',t:ME})}>👑 Reclaim primary Host</button></div>}{HOST&&HERR>0&&<div className="bg-amber-700 text-white text-xs p-1 text-center">Re-opening room…</div>}{G.ph!=='lobby'&&G.ph!=='done'&&!holds&&!nsp&&<div className="bg-slate-800 p-2 text-xs space-y-1"><b className="text-amber-300">🔁 Reclaim your franchise seat</b><div className="flex flex-wrap gap-1">{AT(G).filter(free).map(t=><Btn key={t} c="bg-emerald-700" onClick={()=>claim(t)}>{TDn(t)}</Btn>)}<Btn onClick={()=>setNsp(true)}>👀 Spectate</Btn></div></div>}{!HOST&&!holds&&!nsp&&!rcx&&LT&&G.teams[LT]&&<div className="fixed inset-0 z-[60] flex items-center justify-center p-4" style={{background:'rgba(0,0,0,.75)'}}><div className="w-full max-w-sm rounded-2xl p-4 space-y-3 text-center" style={{background:'var(--card)',border:'2px solid var(--acc)'}}><div className="hd text-xl" style={{color:'var(--acc)'}}>Reclaim Your Team</div><button disabled={!free(LT)} onClick={()=>claim(LT)} className="w-full rounded-xl p-3 font-bold disabled:opacity-50 flex items-center justify-center gap-2 text-white" style={{background:TC[LT],boxShadow:'0 0 18px '+TC[LT]}}><TeamLogo teamId={LT} size={32}/>{free(LT)?'Reclaim '+LT:LT+' is still releasing… try again in a moment'}</button><div className="text-xs text-slate-300">Or take another open team</div><div className="flex flex-wrap gap-1 justify-center">{AT(G).filter(t=>t!==LT&&free(t)).map(t=><Btn key={t} c="bg-emerald-700" onClick={()=>claim(t)}>{TDn(t)}</Btn>)}</div><div className="flex gap-2 justify-center"><Btn onClick={()=>setNsp(true)}>👀 Spectate</Btn><Btn onClick={()=>setRcx(true)}>Close</Btn></div></div></div>}</>;
