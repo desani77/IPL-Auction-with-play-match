@@ -945,10 +945,15 @@ let tm=0,busy=false,again=0,lastSig='';
 function touch(){if(!acct())return;clearTimeout(tm);tm=setTimeout(()=>{tm=0;push()},CFG.DEBOUNCE);if(ST.state!=='pending'&&ST.state!=='syncing')setSt('pending')}
 async function pull(a){a=a||acct();if(!a)return null;const txt=a.p==='kv'?await kvGet(a.dk):(a.jb?await jbGet(a.jb):null);if(!txt)return null;const j=JSON.parse(txt),d=await unpack(j.p);d.n=j.n||'';return d}
 async function push(force){const a=acct();if(!a)return;if(busy){again=1;return}busy=true;setSt('syncing');
-try{const data=collect(),sig=JSON.stringify(data);if(!force&&sig===lastSig){setSt('ok');return}
-const body=JSON.stringify({v:1,ts:Date.now(),n:a.name||'',p:await pack({ls:data})});
+let body;try{const data=collect(),sig=JSON.stringify(data);if(!force&&sig===lastSig){setSt('ok');return}
+body=JSON.stringify({v:1,ts:Date.now(),n:a.name||'',p:await pack({ls:data})});
 if(a.p==='kv')await kvPut(a.dk,body);else if(a.jb)await jbPut(a.jb,body);else{a.jb=await jbNew(body);setAcct(a);await saveRec(a)}
-lastSig=sig;setSt('ok')}catch(e){setSt('error',String((e&&e.message)||e))}finally{busy=false;if(again){again=0;touch()}}}
+lastSig=sig;setSt('ok')}catch(e){const msg=String((e&&e.message)||e);
+ if(body&&/ 404/.test(msg)){/* uninitialised or expired cloud key: create it again, then report success */
+  try{if(a.p==='kv')await kvPut(a.dk,body);else{a.jb=await jbNew(body);setAcct(a);await saveRec(a)}lastSig='';setSt('ok')}catch(e2){setSt('error',String((e2&&e2.message)||e2))}}
+ else if(/failed to fetch|networkerror|load failed|abort|timed? ?out|unreachable/i.test(msg)){/* offline or CORS-blocked: keep data locally and retry on its own */
+  setSt('pending','Cloud not reachable right now. Your progress is saved on this device and will sync automatically.');setTimeout(()=>{if(acct())touch()},30000)}
+ else setSt('error',msg)}finally{busy=false;if(again){again=0;touch()}}}
 async function adopt(a,pre){setAcct(a);await saveRec(a);let changed=0;try{const d=pre||await pull(a);if(d)changed=mergeIn(d)}catch(e){setSt('error','Could not read the cloud save: '+((e&&e.message)||e))}
 ls.set('ipl_mgr',a.name||ls.get('ipl_mgr')||'');await push(true);return changed}
 const unreachable=()=>new Error('Cloud is unreachable right now. Check your connection and try again, or keep playing as Guest.');
@@ -1072,10 +1077,11 @@ h('input',{className:INP,placeholder:'Display / Manager name (optional)',value:f
 h('div',{className:'text-[10px] text-slate-400'},'Demo sign-in: links this Gmail address to your cloud save. No Google password is requested or stored.'),
 h('div',{className:'flex gap-2'},h('button',{disabled:busyM,onClick:()=>run(()=>gmail(ge,f.name)),className:'flex-1 rounded-lg bg-blue-600 text-white font-bold py-2 disabled:opacity-40 active:scale-95'},busyM?'Linking…':'Continue'),h('button',{onClick:()=>setGm(false),className:'rounded-lg bg-slate-700 text-white font-bold px-3 py-2 active:scale-95'},'Back')))}
 else if(tab==='account'&&a){const k=syncKey();body=h('div',{className:'space-y-3 text-sm'},h('div',null,'Signed in as ',h('b',null,a.name||a.user||'Player'),a.user?h('div',{className:'text-xs text-slate-400 break-all'},a.user):null),
-h('div',{className:'rounded-lg bg-slate-800 p-2 text-xs'},h('div',null,'☁️ Cloud: ',h('b',null,ST.state==='ok'?'Synced':ST.state==='syncing'?'Syncing…':ST.state==='pending'?'Changes waiting to sync':ST.state==='error'?'Sync problem':'Ready')),h('div',{className:'text-slate-400'},'Last synced: '+ago(ST.last)+' · Mode: '+(a.p==='kv'?'account sync':'Sync Key')),ST.msg?h('div',{className:'text-red-300 break-words'},ST.msg):null),
+h('div',{className:'rounded-lg bg-slate-800 p-2 text-xs'},h('div',null,'☁️ Cloud: ',h('b',null,ST.state==='ok'?'Synchronized | System Active':ST.state==='syncing'?'Syncing…':ST.state==='pending'?'Changes waiting to sync':ST.state==='error'?'Sync problem':'Ready')),h('div',{className:'text-slate-400'},'Last synced: '+ago(ST.last)+' · Mode: '+(a.p==='kv'?'account sync':'Sync Key')),ST.msg?h('div',{className:'text-red-300 break-words'},ST.msg):null),
 h('button',{onClick:()=>push(true),className:BTN+'bg-emerald-600 w-full text-xs'},'🔄 Sync now'),
 (()=>{const u=myUid();return u?h('div',{className:'rounded-lg bg-slate-800 p-2 space-y-1'},h('div',{className:'text-xs font-bold'},'🆔 Your Player UID'),h('div',{className:'text-2xl font-black text-amber-300 tracking-widest'},u),h('div',{className:'flex flex-wrap gap-2'},h('button',{onClick:async()=>{setOk((await copyTxt(u))?'📋 UID copied':'Copy failed')},className:BTN+'bg-indigo-600'},'📋 Copy UID'),h('a',{href:waUrl(u),target:'_blank',rel:'noopener noreferrer',className:BTN+'bg-green-600 inline-block'},'📲 Share via WhatsApp'))):null})(),
 h('div',{className:'rounded-lg p-2 space-y-1',style:{background:'#1e293b',border:'1px solid #F5C518'}},h('div',{className:'text-xs font-bold'},'🔑 Your Sync Key'),h('input',{id:'ix-key',readOnly:true,className:INP+' text-xs',value:k||'Generating your key…',onFocus:e=>e.target.select()}),h('button',{onClick:copy,className:BTN+'bg-indigo-600 w-full'},'📋 Copy Sync Key'),h('div',{className:'text-[11px] text-amber-300'},'⚠️ Save this Sync Key! If you forget your password or clear your browser cache, you can restore your entire account data anytime using this key.')),
+h(StatsTabs,null),
 h(ReqList,null),
 h('div',{className:'space-y-1'},h('div',{className:'text-xs font-bold'},'♻️ Restore from a Sync Key'),h('div',{className:'flex gap-2'},h('input',{className:INP+' text-xs',placeholder:'IPLSYNC:…',value:key,onChange:e=>setKey(e.target.value)}),h('button',{disabled:busyM||!key.trim(),onClick:()=>run(()=>restoreKey(key)),className:BTN+'bg-amber-600 disabled:opacity-40'},'Restore'))),
 h('button',{onClick:()=>{if(window.confirm('Log out? Your progress stays on this device.')){logout();p.close()}},className:BTN+'bg-red-700 w-full text-xs'},'🚪 Log Out'))}
@@ -1092,6 +1098,12 @@ h('div',{className:'flex items-center justify-between'},h('b',{className:'text-l
 body,err?h('div',{className:'text-xs text-red-300 break-words'},err):null,ok?h('div',{className:'text-xs text-emerald-300'},ok):null));
 return ReactDOM.createPortal(modal,document.body)}
 
+const STK='ipl_career_stats';
+const emptyS=()=>({matches:0,runs:0,wickets:0,highest:0,centuries:0,fifties:0,fivew:0});
+function statsGet(){let o={};try{o=JSON.parse(LS.getItem(STK)||'{}')||{}}catch(e){}return{global:{...emptyS(),...(o.global||{})},tourney:{...emptyS(),...(o.tourney||{})},quick:{...emptyS(),...(o.quick||{})}}}
+function statsRecord(mode,d){try{d=d||{};const s=statsGet(),add=b=>{b.matches+=d.matches||0;b.runs+=d.runs||0;b.wickets+=d.wickets||0;b.highest=Math.max(b.highest,d.highest||0);b.centuries+=d.centuries||0;b.fifties+=d.fifties||0;b.fivew+=d.fivew||0};add(s.global);add(mode==='quick'?s.quick:s.tourney);LS.setItem(STK,JSON.stringify(s));touch()}catch(e){}}
+function StatsTabs(){const[t,setT]=React.useState('global'),s=statsGet()[t],L=[['matches','Matches Played'],['runs','Total Career Runs Scored'],['wickets','Total Career Wickets Taken'],['highest','Highest Individual Score'],['centuries','Total 100s Smashed'],['fifties','Total 50s Smashed'],['fivew','Total 5-Wicket Hauls Managed']];
+return h('div',{className:'rounded-lg p-2 space-y-2',style:{background:'#fff',border:'1px solid #E2E8F0',color:'#0F172A'}},h('div',{className:'text-xs font-bold'},'📈 Career Stats'),h('div',{className:'grid grid-cols-3 gap-1'},[['global','🌍 Global All-Time'],['tourney','🏆 Tournament Mode'],['quick','⚔️ Quick Match & Series']].map(([k,l])=>h('button',{key:k,type:'button',onClick:()=>setT(k),className:'rounded px-1 py-1.5 text-[10px] font-bold leading-tight',style:t===k?{background:'#059669',color:'#fff'}:{background:'#F1F5F9',color:'#334155'}},l))),h('div',{className:'grid grid-cols-2 gap-1'},L.map(([k,l])=>h('div',{key:k,className:'rounded p-2',style:{background:'#F8FAFC',border:'1px solid #E2E8F0'}},h('div',{className:'text-[10px]',style:{color:'#475569'}},l),h('div',{className:'text-lg font-black',style:{color:'#047857'}},String(s[k]))))))}
 function OnlineTag(){useX();return h('span',{className:'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-bold bg-emerald-900/70 text-emerald-300 shrink-0'},[h('span',{key:'d',className:'ipl-dot'}),h('span',{key:'t'},(M.online>0?M.online:'…')+' Online Now')])}
 function HomeMeta(){useX();const[open,setOpen]=React.useState(false),[fo,setFo]=React.useState(false),a=acct();
 const pill=(cls,kids)=>h('span',{className:'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-bold '+cls},kids);
@@ -1108,7 +1120,7 @@ function FooterVisits(){useX();return h('span',null,' · 👁️ '+fmt(M.visits)
 try{document.addEventListener('visibilitychange',()=>{if(document.hidden){flushSave();if(tm){clearTimeout(tm);tm=0;push()}}});window.addEventListener('pagehide',()=>{flushSave();if(tm){clearTimeout(tm);tm=0;push()}})}catch(e){}
 setTimeout(loadVisits,0);setTimeout(startPresence,600);
 setTimeout(async()=>{const a=acct();if(!a)return;try{const d=await pull(a);if(d&&mergeIn(d)>0){try{rr()}catch(e){}}setSt('ok')}catch(e){setSt('error','Offline — will retry on next save')}},1500);
-return{OnlineTag,AddFriendBtn,ReqList,InviteBtn,InviteToast,FriendsTray,myUid,CFG,mkRR,save,flushSave,bc,audioIdle,LBP,makePresence,PRES_ID,touch,push,pull,signUp,login,gmail,restoreKey,syncKey,logout,collect,mergeIn,sha,sha256js,pack,unpack,loadVisits,M,acct,HomeMeta,FooterVisits,AuthModal}
+return{statsRecord,statsGet,OnlineTag,AddFriendBtn,ReqList,InviteBtn,InviteToast,FriendsTray,myUid,CFG,mkRR,save,flushSave,bc,audioIdle,LBP,makePresence,PRES_ID,touch,push,pull,signUp,login,gmail,restoreKey,syncKey,logout,collect,mergeIn,sha,sha256js,pack,unpack,loadVisits,M,acct,HomeMeta,FooterVisits,AuthModal}
 })();
 window.IX=IX;
 function OnlineTag(){return IX.OnlineTag()}
