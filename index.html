@@ -512,6 +512,14 @@ const executeSafeAppExitSequence=()=>{
  /* hard navigation drops ?room= and guarantees a fresh boot with no room state */
  try{location.replace(location.pathname)}catch(e){location.href=location.pathname}
 };
+/* Hard reset of stale network/session memory (does not navigate and does not touch saved tournaments) */
+function forcePurgeStaleRoomNetworkTokens(){
+ try{purgeRoomSession()}catch(e){}
+ try{['IPL_SIM_ACTIVE_ROOM_CODE','IPL_SIM_USER_IS_HOST','IPL_SIM_SELECTED_FRANCHISE','IPL_SIM_MATCH_STATE_BLOB'].forEach(k=>localStorage.removeItem(k));
+  Object.keys(localStorage).filter(k=>k.indexOf('ipl_last_')===0).forEach(k=>localStorage.removeItem(k))}catch(e){}
+ G=null;HOST=false;LOST=false;LTRY=0;HERR=0;LRX=Date.now()}
+/* Clears every remembered room (the 'Rejoin as Player' / 'Resume' cards) when ghost rooms block you */
+function clearAllSavedRooms(){forcePurgeStaleRoomNetworkTokens();try{Object.keys(localStorage).filter(k=>k.indexOf(SK)===0).forEach(k=>localStorage.removeItem(k))}catch(e){}}
 const home=executeSafeAppExitSequence;
 const exitRoom=executeSafeAppExitSequence;
 const leaveRoom=()=>{try{if(CONN&&CONN.open&&PEER)CONN.send({k:'leave',id:PEER.id})}catch(e){}EXITING=true;setTimeout(executeSafeAppExitSequence,250)};
@@ -657,7 +665,7 @@ function App(){
  useEffect(()=>{document.documentElement.dataset.theme=th;try{localStorage.setItem('ipl_th',th)}catch(e){}},[th]);
  CUG=(G&&G.cu)||{};
  const claim=t=>{ME=t;localStorage.setItem('ipl_me',t);try{localStorage.setItem('ipl_me_'+G.code,t)}catch(e){}dispatch({k:'claim',t,id:PEER&&PEER.id,pid:DPID,u:IX.myUid()});dispatch({k:'cust',t,mgr:(localStorage.getItem('ipl_mgr')||'').trim()})};
- const qmStart=()=>{if(qa===qb||((INTL_TEAMS[qa]||INTL_TEAMS[qb])&&!INTL_READY))return;const c=rcode(),g=newG(c,2,[qa,qb]);g.pub=false;g.isTournamentFormat=false;g.qm={n:qn,f:qf};g.cu={[qa]:{mgr:mgr.trim()||'Manager'}};apply(g,{k:'direct'});g.teams[qa].h='local-'+c;saveRoom(g,qa);ME=qa;try{localStorage.setItem('ipl_me',qa);localStorage.setItem('ipl_me_'+c,qa)}catch(e){}startHost(g,qa)};
+ const qmStart=()=>{if(qa===qb||((INTL_TEAMS[qa]||INTL_TEAMS[qb])&&!INTL_READY))return;forcePurgeStaleRoomNetworkTokens();const c=rcode(),g=newG(c,2,[qa,qb]);g.pub=false;g.isTournamentFormat=false;g.qm={n:qn,f:qf};g.cu={[qa]:{mgr:mgr.trim()||'Manager'}};apply(g,{k:'direct'});g.teams[qa].h='local-'+c;saveRoom(g,qa);ME=qa;try{localStorage.setItem('ipl_me',qa);localStorage.setItem('ipl_me_'+c,qa)}catch(e){}startHost(g,qa)};
  const create=()=>{let c;do{c=rcode()}while(localStorage.getItem(SK+c));ME=null;localStorage.removeItem('ipl_me');const g=newG(c,np,sel);g.pub=pubR;g.cf=cfR?1:0;if(g.cf)cfNames(g);saveRoom(g,null);startHost(g,null)};
  const DM=a=>dispatch({...a,mid:vm});
  const PN=({i})=><button type="button" className="underline decoration-dotted underline-offset-2 text-left" onClick={e=>{e.stopPropagation();setPm(+i)}}>{pl(+i).n}</button>;
@@ -684,6 +692,7 @@ function App(){
     {G&&ME&&(G.ph==='lg'||G.ph==='hub')&&!G.qm&&<Pb onClick={()=>setMd('qmx')}>⚡ Quick Match</Pb>}
     {G&&ME&&<Pb onClick={()=>setMd('cust')}>✏️ Edit Franchise Brand</Pb>}
     {G&&<InviteBtn code={G.code}/>}
+    {!G&&<Pb onClick={()=>{if(confirm('Clear all remembered rooms on this device? Saved tournaments listed on the Home screen will be removed.')){clearAllSavedRooms();location.replace(location.pathname)}}}>🧹 Clear Stale Rooms</Pb>}
     {G&&G.ph!=='lobby'&&<Pb onClick={()=>setMd('tb')}>Tables</Pb>}
     {G&&G.fix&&G.fix.length>0&&<Pb onClick={()=>setMd('fx')}>Fixtures</Pb>}
     {G&&G.ph!=='lobby'&&<Pb onClick={()=>setMd('sq')}>Squads</Pb>}
@@ -706,7 +715,7 @@ function App(){
  const [hup,setHup]=useState({});useEffect(()=>{if(G)return;sv.forEach(r=>{const c=r.g.code;if(r.myRole==='player'&&!(c in hup)){setHup(h=>({...h,[c]:null}));probeHost(c,v=>setHup(h=>({...h,[c]:v})))}})},[svn,!!G]);
  const SavedUI=!G&&sv.length>0&&<div className="rounded-xl border-2 p-2 space-y-2" style={{borderColor:'var(--acc)'}}><div className="hd text-lg" style={{color:'var(--acc)'}}>💾 Resume Previous Tournament Room</div>{sv.map(r=>{const g=r.g;return<div key={g.code} className="rounded bg-slate-800 p-2 text-xs space-y-1"><div className="flex justify-between items-center gap-2"><b>Season {SN(g.season)} · Room {g.code}</b><span className="text-amber-300">{prog(g)}</span></div><div className="text-slate-300">{AT(g).join(' · ')}</div><div className="flex gap-2">{r.myRole==='player'?<><Btn c="bg-emerald-600" onClick={()=>rejoin(g.code,r.myTeam||r.me)}>▶ Rejoin as Player ({(r.myTeam||r.me)?((r.g.cu||{})[r.myTeam||r.me]||{}).code||(r.myTeam||r.me):'pick team'})</Btn>{hup[g.code]===false&&<Btn c="bg-slate-700" onClick={()=>resume(g.code)}>👑 Take Over as Host</Btn>}</>:<Btn c="bg-emerald-600" onClick={()=>resume(g.code)}>▶ Resume as Host</Btn>}<Btn c="bg-slate-600" onClick={()=>{if(confirm('Delete saved room '+g.code+'?')){localStorage.removeItem(SK+g.code);setSvn(n=>n+1)}}}>🗑</Btn></div></div>})}</div>;
  const goPg=p=>{setPgS(p);try{sessionStorage.setItem('ipl_pg',p)}catch(e){}};
- const createT=()=>{if(!mgr.trim())return;let c;do{c=rcode()}while(localStorage.getItem(SK+c));ME=null;localStorage.removeItem('ipl_me');const g=newG(c,np,TN.slice(0,np));g.pub=pubR;g.cf=0;saveRoom(g,null);startHost(g,null)};
+ const createT=()=>{if(!mgr.trim())return;forcePurgeStaleRoomNetworkTokens();let c;do{c=rcode()}while(localStorage.getItem(SK+c));ME=null;localStorage.removeItem('ipl_me');const g=newG(c,np,TN.slice(0,np));g.pub=pubR;g.cf=0;saveRoom(g,null);startHost(g,null)};
  const FLOW=!G&&pg==='flow'&&<div className="p-4 max-w-md mx-auto space-y-3">
   <div className="flex items-center justify-between"><button className="text-xs underline text-slate-300" onClick={()=>goPg('hub')}>← Home</button><button className="text-xs underline text-slate-400" onClick={()=>goPg('classic')}>Classic single-page setup</button></div>
   <LobbyPanel/>
