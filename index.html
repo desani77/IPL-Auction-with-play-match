@@ -449,7 +449,9 @@ function pub(){if(HOST){G.lv=LIVE();try{autoCo(G);if(ME&&G.teams&&G.teams[ME]){c
 const dispatch=a=>{if(HOST){try{apply(G,a)}catch(e){console.error(e)}pub()}else if(CONN&&CONN.open)CONN.send(a)};
 function tick(){if(TK)return;TK=1;
  setInterval(()=>{if(HOST&&G&&G.ph==='au'&&!G.au.ps){try{auTick(G)}catch(e){console.error(e)}pub()}},1000);
- setInterval(()=>{if(HOST&&G&&G.ph==='hub'&&G.ms&&G.ms.length){let c=0;[...G.ms].forEach(m=>{if(!m.done&&!m.mp){try{c|=step(G,m,0)}catch(e){console.error(e)}}});if(c)pub()}},700)}
+ setInterval(()=>{if(HOST&&G&&G.ph==='hub'&&G.ms&&G.ms.length){let c=0;try{AT(G).forEach(t=>{const T=G.teams[t];if(T&&T.h)(G.hu=G.hu||{})[t]=1})}catch(e){}
+  const gone=t=>!!(G.hu&&G.hu[t]&&G.teams[t]&&!G.teams[t].h);
+  [...G.ms].forEach(m=>{if(!m.done&&!m.mp){if(G.npcOk!==true&&(gone(m.a)||gone(m.b)))return;try{c|=step(G,m,0)}catch(e){console.error(e)}}});if(c)pub()}},700)}
 function startHost(g,me,n=0){if(EXITING)return;HOST=true;LOST=false;G=healRoom(g);try{migrate(g)}catch(e){}g.ms=g.ms||[];g.dn=g.dn||[];g.season=g.season||2026;RCg(g);if(g.ph==='lg')g.ph='hub';if(me)ME=me;if(!g.oh&&ME&&g.teams[ME])g.oh=ME;try{PEER&&PEER.destroy()}catch(e){}CONNS=[];CONN=null;localStorage.setItem('ipl_host',g.code);localStorage.removeItem('ipl_join');
  PEER=new Peer('ipl26-'+g.code);
  PEER.on('connection',c=>{CONNS.push(c);c.on('open',()=>{G.lv=LIVE();c.send({g:G})});c.on('data',d=>{if(d&&d.k)dispatch({...d,src:c.peer})});c.on('close',()=>{CONNS=CONNS.filter(x=>x!==c);pub()})});
@@ -608,7 +610,8 @@ function IntlFlag({id,size=24}){const W=size*1.5;let g;
  else if(id==='SL')g=<><rect width="30" height="20" fill="#EAB308"/><rect x="1.2" y="1.2" width="27.6" height="17.6" fill="#1E3A8A"/><rect x="5" y="5" width="20" height="10" rx="2" fill="#EAB308"/></>;
  else g=<><rect width="10" height="20" fill="#1D4ED8"/><rect x="10" width="10" height="20" fill="#DC2626"/><rect x="20" width="10" height="20" fill="#16A34A"/></>;
  return<svg role="img" aria-label={id+' flag'} width={W} height={size} viewBox="0 0 30 20" className="shrink-0 rounded-sm" style={{boxShadow:'0 0 0 1px rgba(15,23,42,.25)'}}>{g}</svg>}
-const TOSS_SHOWN=new Set();
+const TOSS_SHOWN=new Set();window.roomContext=window.roomContext||{isNPCAllowedByHost:false,retentionLimit:null};
+
 const GPU={transform:'translate3d(0,0,0)',backfaceVisibility:'hidden',willChange:'opacity,transform'};
 function tossElected(m){try{const w=m&&m.toss&&m.toss.win,b=m.ins&&m.ins[0]&&m.ins[0].bt;if(!w||!b)return null;return b===w?'bat':'bowl'}catch(e){return null}}
 function TossAlert({m}){const[show,setShow]=React.useState(false),id=m&&m.id,w=m&&m.toss&&m.toss.win,ok=!!(m&&m.toss&&m.toss.st==='done'&&w&&tossElected(m));
@@ -617,6 +620,23 @@ function TossAlert({m}){const[show,setShow]=React.useState(false),id=m&&m.id,w=m
  return<div className="fixed inset-0 z-[95] flex items-center justify-center p-4" style={{...GPU,background:'rgba(15,23,42,.88)'}} onClick={()=>setShow(false)}><div className="text-center animate-pulse"><div className="text-6xl mb-3">🪙</div><div className="hd text-3xl sm:text-5xl font-black text-white leading-tight">{w} WON THE TOSS AND CHOSE TO {c==='bat'?'BAT':'BOWL'}</div></div></div>}
 function TossBanner({m}){const c=tossElected(m);if(!c||!m.toss.win)return null;
  return<div className="sticky top-0 z-30 flex items-center justify-center gap-2 px-3 py-1.5 text-xs sm:text-sm font-bold" style={{...GPU,background:'#ECFDF5',color:'#065F46',borderBottom:'2px solid #059669'}}><span className="ipl-dot"/>Toss Update: {TDn(m.toss.win)} won the toss & elected to {c==='bat'?'Batting':'Bowling'}</div>}
+const IMP_SEEN={};
+function ImpactAlert({m}){const[sh,setSh]=React.useState(null),n=(m&&m.si||[]).length,id=m&&m.id;
+ React.useEffect(()=>{if(id==null)return;if(IMP_SEEN[id]==null){IMP_SEEN[id]=n;return}if(n>IMP_SEEN[id]){IMP_SEEN[id]=n;const o=m.so&&m.so[n-1],i=m.si[n-1];const r=requestAnimationFrame(()=>setSh({o,i}));return()=>cancelAnimationFrame(r)}},[n,id]);
+ if(!sh)return null;
+ return<div className="fixed inset-0 z-[96] flex items-center justify-center p-4" style={{...GPU,background:'rgba(15,23,42,.92)'}}><div className="w-full max-w-md rounded-2xl p-4 space-y-3 text-center" style={{background:'#fff',color:'#0F172A',border:'2px solid #059669'}}>
+  <div className="hd text-xl font-black" style={{color:'#047857'}}>⚡ IPL Impact Player Tactical Switch</div>
+  <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+   <div className="rounded-xl p-3" style={{border:'1px solid #FCA5A5',background:'#FEF2F2'}}><div className="text-[11px] font-bold" style={{color:'#991B1B'}}>🏃 Outgoing Player</div><div className="font-black" style={{color:'#DC2626'}}>{sh.o!=null?pl(sh.o).n:'—'}</div></div>
+   <div className="text-2xl animate-spin" style={{animationDuration:'2s'}}>🔄</div>
+   <div className="rounded-xl p-3" style={{border:'1px solid #6EE7B7',background:'#ECFDF5'}}><div className="text-[11px] font-bold" style={{color:'#065F46'}}>🔥 Incoming Player</div><div className="font-black" style={{color:'#059669'}}>{sh.i!=null?pl(sh.i).n:'—'}</div></div>
+  </div>
+  <button type="button" className="w-full rounded-lg py-3 font-black text-white active:scale-95" style={{background:'#059669'}} onClick={()=>setSh(null)}>Resume Play Match</button></div></div>}
+function MomentumBar({m}){try{const I=m&&m.ins&&m.ins[m.inn];if(!I||m.done||!I.bt||!I.bw)return null;const mb=I.mb||120,left=Math.max(1,mb-I.b),crr=I.r/Math.max(1,I.b)*6;
+ let pb;if(m.inn===1&&I.tg){const rrr=(I.tg-I.r)/left*6;pb=50+(crr-rrr)*7+((10-I.w)-5)*3}else pb=50+(crr-8)*6-I.w*2;
+ pb=Math.max(5,Math.min(95,Math.round(pb)));const A=TC[I.bt]||'#059669',B=TC[I.bw]||'#0284C7';
+ return<div className="rounded-lg p-2" style={{...GPU,background:'#fff',border:'1px solid #E2E8F0',color:'#0F172A'}}><div className="flex justify-between text-[11px] font-bold mb-1"><span>{I.bt} {pb}%</span><span>Win Predictor</span><span>{100-pb}% {I.bw}</span></div>
+ <div className="flex h-2.5 w-full overflow-hidden rounded-full" style={{background:'#E2E8F0'}}><div style={{width:pb+'%',background:A,willChange:'width',transition:'width .4s ease'}}/><div style={{width:(100-pb)+'%',background:B,willChange:'width',transition:'width .4s ease'}}/></div></div>}catch(e){return null}}
 function Crest({id,size=24}){return INTL_TEAMS[id]?<IntlFlag id={id} size={size}/>:<TeamLogo teamId={id} size={size}/>}
 function TeamPick({v,set}){const[open,setOpen]=useState(false),[pool,setPool]=useState(INTL_TEAMS[v]?'intl':'ipl');
  const list=pool==='ipl'?TN:Object.keys(INTL_TEAMS),col=(INTL_TEAMS[v]&&INTL_TEAMS[v].c)||TC[v]||'#059669';
@@ -713,6 +733,7 @@ function App(){
     {M&&<Pb onClick={()=>setMd('sc')}>📋 View Scorecard</Pb>}
     {G&&ME&&(G.ph==='lg'||G.ph==='hub')&&!G.qm&&<Pb onClick={()=>setMd('qmx')}>⚡ Quick Match</Pb>}
     {G&&ME&&<Pb onClick={()=>setMd('cust')}>✏️ Edit Franchise Brand</Pb>}
+    {HOST&&G&&<Pb onClick={()=>{G.npcOk=!G.npcOk;window.roomContext.isNPCAllowedByHost=!!G.npcOk;pub()}}>🤖 NPC Auto-Play: {G.npcOk?'Allowed':'Locked'}</Pb>}
     {G&&<InviteBtn code={G.code}/>}
     {!G&&<Pb onClick={()=>{if(confirm('Clear all remembered rooms on this device? Saved tournaments listed on the Home screen will be removed.')){clearAllSavedRooms();location.replace(location.pathname)}}}>🧹 Clear Stale Rooms</Pb>}
     {G&&G.ph!=='lobby'&&<Pb onClick={()=>setMd('tb')}>Tables</Pb>}
@@ -835,7 +856,7 @@ function App(){
    :<><div className="coin text-6xl">🪙</div><div className="hd text-xl flex items-center justify-center gap-2"><TeamLogo teamId={m.toss.win} size={30}/>{m.toss.win} WON THE TOSS! ({m.toss.res==='H'?'Heads':'Tails'})</div>{ME===m.toss.win?<div className="flex gap-2 justify-center"><Btn c="bg-emerald-600" onClick={()=>DM({k:'tchoose',t:ME,c:'bat'})}>🏏 BAT FIRST</Btn><Btn c="bg-sky-700" onClick={()=>DM({k:'tchoose',t:ME,c:'bowl'})}>⚾ BOWL FIRST</Btn></div>:<div>{m.toss.win} is deciding…</div>}</>}
    {HOST&&<Btn onClick={()=>DM({k:'tskip'})}>Skip toss</Btn>}</div>
   :<>
-  <TossAlert m={m}/><TossBanner m={m}/>
+  <TossAlert m={m}/><TossBanner m={m}/><ImpactAlert m={m}/><MomentumBar m={m}/>
   <div className="rounded-xl p-4 flex justify-between items-end" style={{background:`linear-gradient(100deg,${TC[I.bt]}cc,var(--card) 55%,${TC[I.bw]}cc)`,border:'2px solid var(--acc)'}}><div><div className="text-xl hd flex items-center gap-2" style={{color:'#fff'}}><TeamLogo teamId={I.bt} size={40}/>{TDn(I.bt)} batting</div><div className="text-5xl font-bold hd px-3 rounded-full" style={{background:'rgba(0,0,0,.45)'}}>{I.r}/{I.w}</div></div><div className="text-right text-sm text-slate-300"><div className="flex justify-end items-center gap-1 text-xs"><TeamLogo teamId={I.bw} size={22}/>{TDn(I.bw)} bowling</div>Overs {ov(I.b)} / 20<div>CRR {I.b?(I.r/I.b*6).toFixed(2):'0.00'}</div>{I.tg&&<div>Target {I.tg} · RRR {I.b<(I.mb||120)?(Math.max(0,I.tg-I.r)/((I.mb||120)-I.b)*6).toFixed(2):'-'}</div>}</div></div>
   {(()=>{const bt=I.bt,wl=10-I.w;let p;if(I.tg){const need=I.tg-I.r,bl=120-I.b;p=need<=0?1:(bl<=0||wl<=0)?0:1/(1+Math.exp(-(((I.b?I.r/I.b*6:8.5)-need/bl*6)*.35+(wl-5)*.14-(need/bl*6>12?1:0))))}else{const pj=I.b>5?I.r/I.b*(I.mb||120):(I.mb>120?280:165);p=1/(1+Math.exp(-((pj-(I.mb>120?280:165))/(I.mb>120?40:22)+(wl-6)*.12)))*0+(1/(1+Math.exp(-((pj-(I.mb>120?280:165))/(I.mb>120?40:22)+(wl-6)*.12)))>0?1/(1+Math.exp(-((pj-(I.mb>120?280:165))/(I.mb>120?40:22)+(wl-6)*.12))):.5)}const q=Math.max(3,Math.min(97,Math.round((I.tg?p:1-p)*100)));const bp=I.tg?q:100-q;return<div className="rounded bg-slate-900 p-1"><div className="flex justify-between text-xs font-bold"><span className="inline-flex items-center gap-1"><TeamLogo teamId={(I.tg?I.bt:I.bw)} size={20}/>{I.tg?I.bt:I.bw} {I.tg?bp:100-bp}%</span><span>📊 Win Predictor</span><span className="inline-flex items-center gap-1">{(I.tg?100-bp:bp)}% {I.tg?I.bw:I.bt}<TeamLogo teamId={(I.tg?I.bw:I.bt)} size={20}/></span></div><div className="h-2 rounded overflow-hidden flex"><div style={{width:(I.tg?bp:100-bp)+'%',background:TC[I.tg?I.bt:I.bw]}}/><div style={{width:(I.tg?100-bp:bp)+'%',background:TC[I.tg?I.bw:I.bt]}}/></div></div>})()}
   {(I.cw||0)===2&&<div className="rounded bg-orange-600 text-white font-bold text-center p-2 animate-pulse">🔥 ON A HAT-TRICK!</div>}{(I.cw||0)>=3&&<div className="rounded bg-amber-400 text-black font-bold text-center p-2 animate-bounce">🎩 HAT-TRICK HERO! {pl(I.cb).n}</div>}
