@@ -265,9 +265,9 @@ function ball(g,m,d,rc){let DRP='',DK=null;const I=m.ins[m.inn],bat=pl(I.s),bo=p
  {/* v1.2.4 Getting Set vs Tired */const bfs=(I?.bs?.[I.s]?.b)||0;if(bfs>=90&&bfs%6===0&&!(I?.tr?.[I.s])&&Math.random()<.35){I.tr=I.tr||{};I.tr[I.s]=1}
   if(I?.tr?.[I.s]){p-=rc>=4?4:2}else if(bfs>=18){p+=Math.min(5,Math.floor((bfs-12)/9))}}if(I.b>=90){if(DB.has(bo.n)&&d>=5)p-=4;if(DH.has(bat.n)&&rc>=4)p+=5}if(m.inn==1&&m.dew){if(SP.has(bo.n))p-=5;if(rc>=4)p+=3}if(I.fire>0)p+=5;if((I.dc||0)>=2)p-=6;p=Math.max(5,Math.min(99,p))}let r=0,w=0,tmw=1;if(m.tm&&rc>0){const bl0=(I.bl[I.bo]&&I.bl[I.bo].b)||0,fo=Math.max(0,bl0/6-8);if(I.b>=480&&I.nbt==null&&!hum(g,I.bw))I.nbt=I.b;const nb=(I.nbt!=null&&I.b-I.nbt<36)||I.b<24;p-=(rc>=4?10:rc==2?10:8)+(nb?5:0);p+=Math.min(6,fo*.6);if(nb)tmw=1.2;p=Math.max(5,Math.min(99,p))}
  if(p>=100||Math.random()*100<p)r=rc;else{const dp=pct(d,rc,bat.b,bo.w,m.pt),pw=rc<=2?.05*.25:dp>70?.2125:(rc==6?.4675:.255)*(AO?1.5:1)*(F2===0?.3:1)*(FP===0?1.1:1)*((I.dc||0)>=2?1.2:1);if(Math.random()<pw*tmw*(I?.tr?.[I.s]?1.15:1))w=1}
- if(w){DK=dismiss(g,m,I,rc,bo);if(DK.c&&Math.random()<.09){w=0;r=rc;DRP=DK.f!=null?pl(DK.f).n:'The fielder';DK=null}}  try{if((I.b%6)===0)I.cmo=[];const ct=hmCm(SP.has(bo.n),d,r,!!w,DK);if(ct){I.cmo=(I.cmo||[]);I.cmo.push({n:I.b+1,t:ct});if(I.cmo.length>6)I.cmo=I.cmo.slice(-6)}}catch(e){}  I.ord=I.ord||[];[I.s,I.n].forEach(q=>{if(!I.ord.includes(q))I.ord.push(q)});const B=I.bs[I.s]||(I.bs[I.s]={r:0,b:0}),L=I.bl[I.bo]||(I.bl[I.bo]={b:0,r:0,w:0}),S=qg(g,m,I.s),SB=qg(g,m,I.bo);
+ if(w){DK=dismiss(g,m,I,rc,bo);if(DK.c&&Math.random()<.09){w=0;r=rc;DRP=DK.f!=null?pl(DK.f).n:'The fielder';DK=null}}let COMP=0;if(w&&DK&&DK.k==='ro'){COMP=rc===2?(Math.random()<.6?1:0):rc===3?(Math.random()<.5?1:2):0;r=COMP}  try{if((I.b%6)===0)I.cmo=[];const XIf=(m.xi[I.bw]||[]).filter(i=>i!==I.bo),FN=DRP?DRP:(DK&&DK.f!=null?pl(DK.f).n:(XIf.length?pl(XIf[Math.random()*XIf.length|0]).n:'fielder')),ct=hmCm({r,w:!!w,dk:DK,rc,fn:FN,bn:bo.n,drop:!!DRP});if(ct){I.cmo=(I.cmo||[]);I.cmo.push({n:I.b+1,t:ct,fn:(window.activeFielderName&&(w||DRP))?FN:null});if(I.cmo.length>6)I.cmo=I.cmo.slice(-6)}}catch(e){}  I.ord=I.ord||[];[I.s,I.n].forEach(q=>{if(!I.ord.includes(q))I.ord.push(q)});const B=I.bs[I.s]||(I.bs[I.s]={r:0,b:0}),L=I.bl[I.bo]||(I.bl[I.bo]={b:0,r:0,w:0}),S=qg(g,m,I.s),SB=qg(g,m,I.bo);
  B.b++;L.b++;I.b++;S.b=(S.b||0)+1;SB.bw=(SB.bw||0)+1;
- if(!w)I.cw=0;if(w){I.w++;I.cw=(I.cb===I.bo?(I.cw||0):0)+1;I.cb=I.bo;if(I.cw===3)rpl(g,I.bo).ht++;const D=DK||dismiss(g,m,I,rc,bo);if(D.k!=='ro'){L.w++;SB.w++}B.o=D.t;if(D.c&&D.f!=null){const FQ=qg(g,m,D.f);FQ.ct=(FQ.ct||0)+1;try{const R=rpl(g,D.f);R.ct=(R.ct||0)+1}catch(e){}}if(B.r>=15&&(!m.tp||B.r>=m.tp.s))m.tp={s:B.r,t:`${bat.n} dismissed for ${B.r} by ${bo.n}`};I.t.push('W');fx(g,'OUT!',m.id);if(L.w==5)SB.w5=(SB.w5||0)+1}
+ if(!w)I.cw=0;if(w){if(COMP>0){I.r+=COMP;B.r+=COMP;L.r+=COMP;S.r+=COMP;SB.rc=(SB.rc||0)+COMP}I.w++;I.cw=(I.cb===I.bo?(I.cw||0):0)+1;I.cb=I.bo;if(I.cw===3)rpl(g,I.bo).ht++;const D=DK||dismiss(g,m,I,rc,bo);if(D.k!=='ro'){L.w++;SB.w++}B.o=D.t;if(D.c&&D.f!=null){const FQ=qg(g,m,D.f);FQ.ct=(FQ.ct||0)+1;try{const R=rpl(g,D.f);R.ct=(R.ct||0)+1}catch(e){}}if(B.r>=15&&(!m.tp||B.r>=m.tp.s))m.tp={s:B.r,t:`${bat.n} dismissed for ${B.r} by ${bo.n}`};I.t.push('W');fx(g,'OUT!',m.id);if(L.w==5)SB.w5=(SB.w5||0)+1}
  else{I.r+=r;B.r+=r;L.r+=r;S.r+=r;SB.rc=(SB.rc||0)+r;I.t.push(r);if(r==4){S.f++;B.f=(B.f||0)+1;fx(g,'FOUR',m.id)}if(r==6){S.s++;B.s=(B.s||0)+1;fx(g,'SIX',m.id)}
   if(B.r>=100&&B.r-r<100){S.h100=(S.h100||0)+1;fx(g,'CENTURY!',m.id)}else if(B.r>=50&&B.r-r<50){S.h50=(S.h50||0)+1;B.ff=B.b;fx(g,'FIFTY!',m.id)}
   if(r%2)[I.s,I.n]=[I.n,I.s]}
@@ -422,21 +422,72 @@ const comprehensiveHindiMatrix={
  noball:["Oh no! Gendbaaj ne line cross ki, no-ball ka ishara aur ab milega FREE HIT!"]};
 window.gameConfig=window.gameConfig||{};if(window.gameConfig.hindiVoiceCommentary==null){try{window.gameConfig.hindiVoiceCommentary=localStorage.getItem('ipl_hindi_vc')==='1'}catch(e){window.gameConfig.hindiVoiceCommentary=false}}
 function hmPick(a){return Array.isArray(a)&&a.length?a[Math.random()*a.length|0]:''}
-/* Chooses a text from the matrix for one delivery. sp = spinner, d = delivery level 1-6, r = runs, w = wicket, dk = dismissal object */
-function hmCm(sp,d,r,w,dk){try{const M=comprehensiveHindiMatrix,pickKey=o=>{const k=Object.keys(o||{}).filter(x=>x!=='general'&&x!=='yorker'&&x!=='bouncer'&&x!=='googly'&&x!=='doosra');return k[Math.random()*k.length|0]};
- const shotFor=(grp)=>{const G=M[grp]||{};if(!sp&&d===5&&G.pull_shot)return'pull_shot';if(sp&&G.slog_sweep&&Math.random()<.5)return'slog_sweep';return pickKey(G)};
- if(w){const G=M.wicket;if(dk&&(dk.k==='b'||dk.k==='lbw'||dk.k==='ro'))return hmPick(G.general);return hmPick(G[shotFor('wicket')])||hmPick(G.general)}
- if(r>=6)return hmPick(M.six[shotFor('six')]);if(r>=4)return hmPick(M.four[shotFor('four')]);
- if(r===3)return hmPick(M.three[shotFor('three')]);if(r===2)return hmPick(M.two[shotFor('two')]);if(r===1)return hmPick(M.one[shotFor('one')]);
- const D=M.dot;if(!sp&&d===6)return hmPick(D.yorker);if(!sp&&d===5&&Math.random()<.5)return hmPick(D.bouncer);if(sp&&d===2&&Math.random()<.5)return hmPick(D.googly);if(sp&&d===3&&Math.random()<.5)return hmPick(D.doosra);
- return hmPick(D[shotFor('dot')])}catch(e){return''}}
+/* v1.2.6 Definitive broadcaster matrix: intent x fielding outcome (f = fielder, b = bowler, t = runs tried, c = runs completed, r = runs scored) */
+const definitiveBroadcasterMatrix={
+ six:{six:(f,b)=>`Zabardast chakka! Ballebaaj ne SIX maarne ki koshish ki aur ball ko darshak deergah mein bhej diya!`,
+  dot:(f,b)=>`Ballebaaj ne SIX lagane ka bada prayas kiya, kintu gendbaaz ki speed se beat hue, dot ball!`,
+  caught:(f,b)=>`Bada jhatka! SIX maarne ki try mein hawa mein uncha shot khela aur ${f} ne shandaar catch lapka! Ballebaaj out!`,
+  catch_drop:(f,b,t,c,r)=>`Oh My God! Ballebaaj ne SIX lagane ki try ki, hawa mein ball thi par ${f} ne ek aasan sa catch miss kar diya! Scorecard mein ${r} run judenge!`,
+  bold:(f,b)=>`SIX maarne ki try mein aage nikle, par ${b} ki gend ne stumps bikher diye! Bold out!`,
+  lbw:(f,b)=>`SIX maarne ki koshish mein gend pad par lagi, umpire ki ungli uthi! LBW out!`},
+ four:{four:(f,b)=>`Khubsoorat timing! Ballebaaj ne FOUR lagaya aur ball goli ki tarah baundri line ke baahar!`,
+  dot:(f,b)=>`FOUR batorne ke liye shandaar cover drive maara thaa, par ${f} ne diving karke run rok diya, dot ball!`,
+  caught:(f,b)=>`Out! Ballebaaj FOUR lagane ki koshish mein boundary par ${f} ko ek aasan sa catch de baithe!`,
+  catch_drop:(f,b,t,c,r)=>`Jeevandaan! Ballebaaj ne FOUR lagane ki try ki, ball hawa mein thi par ${f} ne catch chhod diya! Scorecard mein ${r} run judenge!`,
+  bold:(f,b)=>`FOUR ke irade se shot khela, par ${b} ki gend andar aakar seedha stumps par! Bold out!`,
+  lbw:(f,b)=>`FOUR maarne gaye, par gend seedha pads par! LBW out!`},
+ single:{completed:(f,b,r)=>`Achhi running! Ballebaaj ne ${r} run lene ki try ki aur tezi se daudkar ${r} run poore kar liye!`,
+  dot:(f,b,t)=>`${t||1} run lene ki koshish thi, par ${f} ne tezi se ball rokkar run ka mauka band kar diya, dot ball!`,
+  caught:(f,b,t)=>`${t||1} run ke liye shot khela, par ball hawa mein gayi aur ${f} ne catch pakad liya! Ballebaaj out!`,
+  catch_drop:(f,b,t,c,r)=>`Aasan sa catch! ${f} ne ball gira di, ballebaaj ko jeevandaan aur ${r} run scorecard mein!`,
+  bold:(f,b,t)=>`${t||1} run ke liye khela, par ${b} ki gend ne stumps uda diye! Bold out!`,
+  lbw:(f,b,t)=>`${t||1} run ke liye khela, par gend pads par lagi aur umpire ne LBW out de diya!`,
+  run_out:(f,b,tried,completed)=>{
+   if(tried===3&&completed===1)return `Ballebaaj ne 3 run lene ki try ki! Pehla run poora kiya, par dusre run ke prayas mein ${f} ke adbhut direct throw ne unhe RUN OUT kar diya! Scorecard mein 1 run judega.`;
+   if(tried===3&&completed===2)return `Ballebaaj ne 3 run ki try ki! Do run tezi se poore kiye, par teesre run ke liye daudte hi ${f} ne tezi se ball wicketkeeper ko thamaai aur ballebaaj RUN OUT! Scorecard mein 2 run judenge.`;
+   if(tried===2&&completed===1)return `Ballebaaj ne 2 run lene ki try ki! Pehla run asaani se liya, par dusre run ke liye daudte hi ${f} ke tezi se kiye gaye throw par ballebaaj RUN OUT ho gaye! Scorecard mein 1 run milega.`;
+   if(tried===1)return `Ek run churaane ke prayas mein tezi se daude, par ${f} ne palak jhapakte hi ball ko uda diya aur ballebaaj pehle hi run par RUN OUT!`;
+   return `Ballebaaj ne ${tried} run lene ki try ki, par ${f} ke seedhe throw ne pehle hi run par unhe RUN OUT kar diya! Koyi run nahi judega.`}},
+ defense:{dot:(f,b)=>`Ballebaaj ne poori tarah se samman diya, halke haatho se DEFENSE kiya, run lene ki koyi koshish nahi.`,
+  bold:(f,b)=>`Oh niraashajanak! Keval defense karne gae par ball bat ka andaruni kinara lekar seedha stumps par ja lagi! Bold out!`,
+  lbw:(f,b)=>`Defense karne ki koshish thi, par gend pads par lagi aur umpire ki ungli uthi! LBW out!`,
+  caught:(f,b)=>`Defense karne gaye, par ball bat ka kinara lekar hawa mein uthi aur ${f} ne catch pakad liya! Ballebaaj out!`,
+  catch_drop:(f,b,t,c,r)=>`Defense mein ball bat ka kinara lekar uthi, par ${f} ne aasan sa catch gira diya! Ballebaaj bach gaye!`}};
+/* c = {r,w,dk,rc,fn,bn,drop}. Updates the window state tracking, then compiles the line strictly from intent + outcome + fielder */
+function hmCm(c){try{
+ const M=definitiveBroadcasterMatrix,r=c.r||0,rc=c.rc||0,f=c.fn||'fielder',b=c.bn||'bowler',dk=c.dk;
+ const I=rc>=6?'six':rc===4?'four':rc>=1?'single':'defense',tried=(rc>=1&&rc<=3)?rc:0;
+ const dt=c.drop?'catch_drop':!c.w?null:dk&&dk.k==='ro'?'run_out':dk&&dk.k==='c'?'caught':dk&&dk.k==='b'?'bold':'lbw';
+ window.currentBattingIntent=I;window.targetRunsAttempted=tried;
+ window.matchOutcome={runsScored:r,dismissalType:dt};
+ window.activeFielderName=(dt==='run_out'||dt==='caught'||dt==='catch_drop'||(!c.w&&r===0))?f:'';
+ const G=M[I];
+ if(dt==='run_out')return G.run_out?G.run_out(f,b,tried,r):M.single.run_out(f,b,tried,r);
+ if(dt)return(G[dt]||M.single[dt])(f,b,tried,r,r);
+ if(r>0)return I==='single'?G.completed(f,b,r):G[I](f,b);
+ return G.dot(f,b,tried)}catch(e){return''}}
+/* Async voice binding: voices load late, so they are cached on voiceschanged and re-read at speak time */
+function pickHindiVoice(){const vs=(window.speechSynthesis?.getVoices?.())||[];
+ const hi=vs.filter(v=>/^hi([-_]|$)/i.test(v.lang||'')||/hindi/i.test(v.name||''));
+ const male=hi.find(v=>/male|hemant|madhur|ravi|prabhat|rishi|aarav/i.test(v.name)&&!/female/i.test(v.name))||hi.find(v=>/google/i.test(v.name));
+ return male||hi[0]||vs.find(v=>/^en[-_]IN/i.test(v.lang||'')&&!/female|neerja|heera/i.test(v.name))||vs.find(v=>/^en[-_]IN/i.test(v.lang||''))||null}
+try{if(window.speechSynthesis){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=()=>{console.log('Web Speech Engine Voices Synchronized Successfully.')}}}catch(e){}
+function speakHindiCommentary(text){
+ if(!window.gameConfig||!window.gameConfig.hindiVoiceCommentary||!text)return;
+ if(!window.speechSynthesis||typeof SpeechSynthesisUtterance==='undefined')return;
+ try{window.speechSynthesis.cancel();clearTimeout(window.__spT);
+  window.__spT=setTimeout(()=>{try{const u=new SpeechSynthesisUtterance(text),v=pickHindiVoice();
+   if(v){u.voice=v;u.lang=/^hi/i.test(v.lang||'')?'hi-IN':v.lang}else u.lang='hi-IN';
+   u.pitch=.95;u.rate=1.02;u.volume=1;window.__utt=u/* keep a reference so Chrome does not garbage-collect it mid-speech */;
+   try{window.speechSynthesis.resume()}catch(e){}
+   window.speechSynthesis.speak(u)}catch(e){console.error(e)}},100)}catch(e){console.error(e)}}
 /* Commentary feed: shows only the CURRENT over (cleared automatically when a new over starts) and speaks the newest line in hi-IN when the toggle is on */
 function CommentaryFeed(p){const I=p?.I,L=(I?.cmo||[]).slice(-6),last=L[L.length-1],id=last?(last.n+':'+(last.t||'').length):'',seen=React.useRef(null);
  React.useEffect(()=>{try{if(seen.current===null){seen.current=id;return}if(!last||seen.current===id)return;seen.current=id;
   if(!window.gameConfig?.hindiVoiceCommentary||typeof MUTE!=='undefined'&&MUTE||!window.speechSynthesis||typeof SpeechSynthesisUtterance==='undefined')return;
-  const u=new SpeechSynthesisUtterance(last.t);u.lang='hi-IN';u.rate=1.02;window.speechSynthesis.cancel();window.speechSynthesis.speak(u)}catch(e){console.error(e)}},[id]);
+  speakHindiCommentary(last.t)}catch(e){console.error(e)}},[id]);
  if(!L.length)return null;
- return<div className="rounded-lg bg-slate-800/70 p-2 text-xs space-y-1 max-h-32 overflow-y-auto" aria-live="polite"><div className="font-bold text-emerald-400">🎙️ Commentary (this over)</div>{L.slice().reverse().map((x,i)=><div key={x?.n+'-'+i} className={i===0?'text-white':'text-slate-400'}>{x?.t}</div>)}</div>}
+ return<div className="rounded-lg bg-slate-800/70 p-2 text-xs space-y-1 max-h-32 overflow-y-auto" aria-live="polite"><div className="font-bold text-emerald-400">🎙️ Commentary (this over)</div>{last?.fn&&<div className="text-amber-300">Fielder Node: {last.fn}</div>}{L.slice().reverse().map((x,i)=><div key={x?.n+'-'+i} className={i===0?'text-white':'text-slate-400'}>{x?.t}</div>)}</div>}
 /* v1.2.4 Auction pool / set-order / badge helpers */
 function poolN(g){try{const tot=Math.min(500,P.length),n=Math.round(+g?.pn);if(g?.pn&&isFinite(n)){const mn=Math.min(tot,Math.max(30,(AT(g)?.length||2)*11));return Math.max(mn,Math.min(tot,n))}return[80,120,200,9999][g?.pool||0]||80}catch(e){return 80}}
 function poolIds(g){try{return P.map((_,i)=>i).filter(i=>!P[i]?.x).sort((a,b)=>v(b)-v(a)).slice(0,poolN(g))}catch(e){return[]}}
@@ -938,7 +989,7 @@ function App(){
     {G&&<div data-keep="1" className="mb-2 rounded-lg bg-slate-800 p-2"><b className="text-xs">👥 All Owners</b>{AT(G).map(t=>{if(!t||!G?.teams?.[t])return null;const hh=G.teams[t].h,mine=!!(hh&&PEER&&hh===PEER.id),live=!!(hh&&(mine||(G.lv||[]).includes(hh)));return<div key={t} className="flex items-center justify-between gap-2 mt-1.5"><div className="min-w-0"><div className="text-xs font-bold truncate" style={{color:TC[t]}}>{TDn(t)}</div><div className="text-[10px] text-slate-400 truncate">{TMg(t)||(hh?'Player':'NPC / Open')}</div></div><span className={'shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded '+(live?'bg-emerald-600/30 text-emerald-300':'bg-slate-600/50 text-slate-400')}>{live?'Online':'Offline'}</span></div>})}</div>}
    <div className="dr-list flex flex-col gap-2" onClick={e=>{const t=e.target;if(t.closest&&t.closest('button')&&!t.closest('[data-keep]'))setTimeout(()=>setDr(false),60)}}>
     {G&&<div data-keep="1"><VoiceBar/></div>}
-    <Pb onClick={()=>{const c=window.gameConfig=window.gameConfig||{};c.hindiVoiceCommentary=!c.hindiVoiceCommentary;try{localStorage.setItem('ipl_hindi_vc',c.hindiVoiceCommentary?'1':'0');if(!c.hindiVoiceCommentary)window.speechSynthesis?.cancel()}catch(e){}N(x=>x+1)}}>🗣️ Hindi Commentary Voice: {window.gameConfig?.hindiVoiceCommentary?'On':'Off'}</Pb>     <Pb onClick={()=>{MUTE=!MUTE;try{localStorage.setItem('ipl_mute',MUTE?'1':'0')}catch(e){}setMu(MUTE)}}>{mu?'🔇 Sound Off':'🔊 Sound On'} (Toggle Sound)</Pb>
+    <Pb onClick={()=>{const c=window.gameConfig=window.gameConfig||{};c.hindiVoiceCommentary=!c.hindiVoiceCommentary;try{localStorage.setItem('ipl_hindi_vc',c.hindiVoiceCommentary?'1':'0');if(!c.hindiVoiceCommentary)window.speechSynthesis?.cancel();else speakHindiCommentary('Hindi commentary chalu ho gayi hai')}catch(e){}N(x=>x+1)}}>🗣️ Hindi Commentary Voice: {window.gameConfig?.hindiVoiceCommentary?'On':'Off'}</Pb>     <Pb onClick={()=>{MUTE=!MUTE;try{localStorage.setItem('ipl_mute',MUTE?'1':'0')}catch(e){}setMu(MUTE)}}>{mu?'🔇 Sound Off':'🔊 Sound On'} (Toggle Sound)</Pb>
     <Pb onClick={()=>{if(window.__dip&&!isSA())installNow();else setGm('inst')}}>{isSA()?'✅ Installed':'📲 Install App'}</Pb>
     {M&&<Pb onClick={()=>setMd('sc')}>📋 View Scorecard</Pb>}
     {G&&ME&&(G.ph==='lg'||G.ph==='hub')&&!G.qm&&<Pb onClick={()=>setMd('qmx')}>⚡ Quick Match</Pb>}
