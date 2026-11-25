@@ -165,9 +165,9 @@ const rl=i=>{const p=pl(i);return p.r?p.r:WKS.has(p.n)?'WK':p.b-p.w>=30?'BAT':p.
 const grp=i=>{const r=rl(i);return r==='BAT'||r==='WK'?0:r==='AR'?1:2};
 function autoXI(sq){const by=(r,f)=>sq.filter(i=>rl(i)===r).sort((a,b)=>f(b)-f(a));let ids=[],o=0;const add=i=>{if(ids.includes(i)||(pl(i).o==='O'&&o>=4))return 0;ids.push(i);if(pl(i).o==='O')o++;return 1};const take=(l,n)=>{let c=0;l.forEach(i=>{if(c<n&&add(i))c++})};const sp=i=>SP.has(pl(i).n);
  take(by('WK',i=>pl(i).b),1);take(by('BAT',i=>pl(i).b),4);take(by('AR',i=>pl(i).b+pl(i).w),2);const bw=by('BOWL',i=>pl(i).w),ns=ids.filter(i=>rl(i)==='AR'&&sp(i)).length,bs=Math.max(0,2-ns);take(bw.filter(sp),bs);take(bw.filter(i=>!sp(i)),4-bs);take(bw,4-ids.filter(i=>rl(i)==='BOWL').length);take([...sq].sort((a,b)=>v(b)-v(a)),11-ids.length);const s=[...ids].sort((a,b)=>v(b)-v(a));const cp=ids.find(i=>pl(i).k);const sub=sq.filter(i=>!ids.includes(i)).sort((a,b)=>v(b)-v(a)).slice(0,5);if(cp!=null){return{ids,sub,c:cp,vc:s.find(i=>i!==cp)}}return{ids,sub,c:s[0],vc:s[1]}}
-function startAu(g){const C=[18,14,11],ret=new Set();
- AT(g).forEach(t=>{const T=g.teams[t];if(!T.ok&&!T.h){let o=0;T.rt=P.map((_,i)=>i).filter(i=>P[i]?.t===t).sort((a,b)=>v(b)-v(a)).filter(i=>P[i]?.o==='I'||o++<2).slice(0,3)}
-  T.rt.forEach((i,k)=>{T.purse-=C[k];T.sq.push(i);T.pr[i]=C[k];ret.add(i)});T.rtm=3-T.rt.length});
+function startAu(g){const C=lcCosts(),ret=new Set();
+ AT(g).forEach(t=>{const T=g.teams[t];if(!T.ok&&!T.h){let o=0;T.rt=P.map((_,i)=>i).filter(i=>P[i]?.t===t).sort((a,b)=>v(b)-v(a)).filter(i=>P[i]?.o==='I'||o++<2).slice(0,Math.min(lcRet(g),LIM(g).max));T.rt=lcAfford(T.rt)}
+  T.rt.forEach((i,k)=>{T.purse-=C[k];T.sq.push(i);T.pr[i]=C[k];ret.add(i)});T.rtm=lcRtm(g)});
  const top=new Set(poolIds(g)),pool=P.map((_,i)=>i).filter(i=>!P[i]?.x&&!ret.has(i)&&top.has(i)),r3=i=>{const r=rl(i);return r==='WK'?'BAT':r},R3=aucOrder(g),st=R3.map(r=>pool.filter(i=>v(i)>=84&&r3(i)===r)),rest=pool.filter(i=>!st.some(s=>s.includes(i)));
  const gr=R3.map(r=>pool.filter(i=>r3(i)===r).sort((a,b)=>v(b)-v(a))),sets=[];while(gr.some(x=>x.length))gr.forEach(x=>{if(x.length)sets.push(x.splice(0,15))});sets.forEach(s=>s.sort(()=>Math.random()-.5));
  g.ph='au';g.fd=[];g.au={q:sets.flat(),sets,i:0,bid:.5,by:null,t:g.tm||10,ps:0,tu:0,u:[],rd:1,po:{},res:{}}}
@@ -204,14 +204,14 @@ const qg=(g,m,i)=>m.qx?((m.qs=m.qs||{})[i]||(m.qs[i]={r:0,w:0,s:0,f:0})):gs(g,i)
 const nrr=T=>T&&T.bf&&T.ba?T.rf/(T.bf/6)-T.ra/(T.ba/6):0;
 const rank=g=>[...AT(g)].sort((a,b)=>(g.tb[b].pts-g.tb[a].pts)||(nrr(g.tb[b])-nrr(g.tb[a])));
 /* Room sanitizer: every incoming/loaded room gets valid team records, so no loop can read .h of undefined */
-function healRoom(g){if(!g||typeof g!=='object')return g;if(!g.teams||typeof g.teams!=='object')g.teams={};if(g.at!=null&&!Array.isArray(g.at))delete g.at;
+function healRoom(g){if(!g||typeof g!=='object')return g;try{g.mxRet=lcNorm(g.mxRet,4);g.mxRtm=lcNorm(g.mxRtm,2)}catch(e){}if(!g.teams||typeof g.teams!=='object')g.teams={};if(g.at!=null&&!Array.isArray(g.at))delete g.at;
  (g.at||TN).forEach(t=>{let T=g.teams[t];if(!T||typeof T!=='object')T=g.teams[t]={};if(T.h===undefined)T.h=null;if(typeof T.purse!=='number')T.purse=120;['sq','rt'].forEach(k=>{if(!Array.isArray(T[k]))T[k]=[]});if(!T.pr||typeof T.pr!=='object')T.pr={};if(typeof T.ok!=='number')T.ok=0;if(typeof T.rtm!=='number')T.rtm=3});
  ['ms','dn','fix','po'].forEach(k=>{if(!Array.isArray(g[k]))g[k]=[]});if(!g.cu||typeof g.cu!=='object')g.cu={};return g}
 const AT=g=>{const a=(g&&Array.isArray(g.at)&&g.at)||TN;if(g){const T=g.teams||(g.teams={});a.forEach(t=>{if(!T[t])T[t]={h:null,purse:120,sq:[],pr:{},rt:[],ok:0,rtm:3}});}return g?a.filter(t=>!g.teams?.[t]?.isSpectator):a};
 const ATALL=g=>{AT(g);return(g&&Array.isArray(g.at)&&g.at)||TN};
 const GATEK=['xi','dl','run','pickbo','nextbat','over','imp','bid','pass','rtm','retain','mretain','tcall','tchoose','tans','trdy'];
 function setup(g){}
-const newG=(code,n,sel)=>({code,n,at:sel,ph:'lobby',teams:sel.reduce((o,t)=>(o[t]={h:null,purse:120,sq:[],pr:{},rt:[],ok:0,rtm:3},o),{}),fc:0,st:{},tb:{},fl:{},mode:0,fix:[],fi:0,po:[],m:null,fx:null,ch:null,au:null,ms:[],dn:[],season:2026,rec:{pl:{},tm:{},hof:[]}});
+const newG=(code,n,sel)=>({code,n,at:sel,ph:'lobby',teams:sel.reduce((o,t)=>(o[t]={h:null,purse:120,sq:[],pr:{},rt:[],ok:0,rtm:3},o),{}),mxRet:4,mxRtm:2,fc:0,st:{},tb:{},fl:{},mode:0,fix:[],fi:0,po:[],m:null,fx:null,ch:null,au:null,ms:[],dn:[],season:2026,rec:{pl:{},tm:{},hof:[]}});
 const can=(g,t,p,pr)=>{const T=g.teams[t];return T.purse-Math.max(0,LIM(g).min-1-T.sq.length)*.5>=pr-1e-9&&T.sq.length<LIM(g).max&&!(pl(p).o==='O'&&T.sq.filter(i=>pl(i).o==='O').length>=(g.osm||8))};
 const fill=g=>AT(g).forEach(t=>{while(g.teams[t].sq.length<15)g.teams[t].sq.push(1000+g.fc++)});
 function xiOf(g,t){const s=[...g.teams[t].sq].sort((a,b)=>v(b)-v(a));const x=[];let o=0;s.forEach(p=>{if(x.length<11&&!(pl(p).o==='O'&&o>=4)){x.push(p);if(pl(p).o==='O')o++}});s.forEach(p=>{if(x.length<11&&!x.includes(p))x.push(p)});return x.sort((a,b)=>pl(b).b-pl(a).b)}
@@ -556,6 +556,7 @@ function apply(g,a){healRoom(g);try{if(GATEK.includes(a?.k)){const hid=a.src||(t
  case'ret':if(g.cf){AT(g).forEach(t=>{const T=g.teams[t];T.rt=[];T.ok=1});startAu(g);AT(g).forEach(t=>{g.teams[t].rtm=0})}else g.ph='ret';break;
  case'addteam':{if(!a.src&&['lobby','au','mode','fix','lg','hub','done'].includes(g.ph)){const at=(g.at||TN).slice();if(at.length>=10)break;const t=(a.t&&TN.includes(a.t)&&!at.includes(a.t))?a.t:TN.find(x=>!at.includes(x));if(!t)break;at.push(t);g.at=at;g.teams[t]={h:null,purse:120,sq:[],pr:{},rt:[],ok:0,rtm:3};g.n=at.length;if(g.ph==='au')liveAuTeam(g,t);else if(g.ph!=='lobby')liveAddTeam(g,t)}break}
  case'seasoncfg':{if(a.src)break;g.nx={fmt:a.fmt==='mini'?'mini':'mega',sqn:Math.max(11,Math.min(25,parseInt(a.sqn,10)||25)),pl:[80,120,200,9999].includes(+a?.pl)?+a.pl:80};break}
+ case'lobcfg':{if(a.src||g.ph!=='lobby')break;if(a.ret!==undefined)g.mxRet=lcNorm(a.ret,4);if(a.rtm!==undefined)g.mxRtm=lcNorm(a.rtm,2);break}
  case'retlim':{if(a.src)break;g.rl=Math.max(0,Math.min(20,parseInt(a.n,10)||0));break}
  case'tpause':{if(a.src)break;const T=g.teams?.[a.t];if(T)T.isPaused=!!a.v;break}
  case'delteam':{if(a.src)break;const all=ATALL(g);if(!all.includes(a.t)||all.length<=2||['ptr','qtr'].includes(g.ph)||((g.po||[]).length&&g.ph!=='done'))break;delTeam(g,a.t);break}
@@ -575,7 +576,7 @@ function apply(g,a){healRoom(g);try{if(GATEK.includes(a?.k)){const hid=a.src||(t
  case'rmteam':{if(g.ph==='lobby'&&!a.src){const at=(g.at||TN).slice(),T=g.teams[a.t];if(at.length<=2||!T||T.h)break;g.at=at.filter(x=>x!==a.t);delete g.teams[a.t];g.n=g.at.length}break}
  case'swapbrand':{if(g.ph==='lobby'&&!a.src){const at=(g.at||TN).slice(),i=at.indexOf(a.t),T=g.teams[a.t];if(i<0||!T||T.h||!TN.includes(a.to)||at.includes(a.to))break;at[i]=a.to;g.at=at;g.teams[a.to]=T;delete g.teams[a.t];if(g.cu&&g.cu[a.t]){g.cu[a.to]=g.cu[a.t];delete g.cu[a.t]}}break}
  case'cf':{if(g.ph==='lobby'&&!a.src){g.cf=a.v?1:0;if(g.cf)cfNames(g)}break}
- case'retain':{const T=g.teams[a.t];if(g.ph==='ret'&&T&&!T.ok){let o=0;T.rt=(a.ids||[]).filter(i=>P[i]&&P[i]?.t===a.t).slice(0,3).filter(i=>P[i]?.o==='I'||o++<2);T.ok=1}break}
+ case'retain':{const T=g.teams[a.t];if(g.ph==='ret'&&T&&!T.ok){let o=0;T.rt=lcAfford((a.ids||[]).filter(i=>P[i]&&P[i]?.t===a.t).slice(0,Math.min(lcRet(g),LIM(g).max)).filter(i=>P[i]?.o==='I'||o++<2));T.ok=1}break}
  case'au':startAu(g);break;
  case'pool':if(g.ph==='lobby'){g.pool=a.p;g.pn=null}break;
   case'aucfg':{if(g.ph!=='lobby'||a.src)break;
@@ -671,16 +672,31 @@ if(!FOINIT){FOINIT=1;
 
 const LIVE=()=>CONNS.filter(c=>c.open).map(c=>c.peer).concat(PEER&&PEER.id?[PEER.id]:[]);
 /* ===== v1.2.4 Decentralized Room Autopilot: the room survives without its original Host ===== */
-const RCX=()=>{const r=(window.roomContext=window.roomContext||{isNPCAllowedByHost:false,retentionLimit:null});if(r.isIndependentSessionActive==null)r.isIndependentSessionActive=false;return r};
+const RCX=()=>{const r=(window.roomContext=window.roomContext||{isNPCAllowedByHost:false,retentionLimit:null});if(r.isIndependentSessionActive==null)r.isIndependentSessionActive=false;if(r.maxRetentionsAllowed==null)r.maxRetentionsAllowed=4;if(r.maxRtmAllowed==null)r.maxRtmAllowed=2;return r};
 RCX();
 /* independent = the original host seat has no live human holder (host offline / refreshed / gone) */
 /* v1.2.4: host-controlled retention policy (0-20). Binds roomContext instantly, then debounced broadcast to every peer */
 let RET_T=0;
 function retBroadcast(n){try{n=Math.max(0,Math.min(20,parseInt(n,10)||0));RCX().retentionLimit=n;clearTimeout(RET_T);RET_T=setTimeout(()=>{try{dispatch({k:'retlim',n})}catch(e){}},120)}catch(e){}}
+
+/* v1.2.7: Host lobby config - Max Retentions / Max RTM cards (strict 0-25). Defaults 4 / 2 when a value is null, empty or undefined */
+function lcNorm(v,d){try{if(v===null||v===undefined||v===''||typeof v==='boolean')return d;const n=parseInt(v,10);if(!isFinite(n))return d;return Math.max(0,Math.min(25,n))}catch(e){return d}}
+function lcRet(g){return lcNorm(g?.mxRet,4)}
+function lcRtm(g){return lcNorm(g?.mxRtm,2)}
+function lcCost(k){return [18,14,11][k]??11}
+function lcCosts(){return Array.from({length:30},(_,k)=>lcCost(k))}
+const LC_BUDGET=100;
+function lcAfford(ids){let t=0;const out=[];for(let k=0;k<(ids||[]).length;k++){const c=lcCost(k);if(t+c>LC_BUDGET)break;t+=c;out.push(ids[k])}return out}
+function lcSet(key,val){try{if(!HOST||!G)return;const n=lcNorm(val,key==='ret'?4:2),ctx=RCX();if(key==='ret'){ctx.maxRetentionsAllowed=n;G.mxRet=n}else{ctx.maxRtmAllowed=n;G.mxRtm=n}
+ const pkt={k:'LOBCFG',ret:lcRet(G),rtm:lcRtm(G)};
+ try{dispatch({k:'lobcfg',[key]:n})}catch(e){console.error("Lobby Config Sync Error: ",e)}
+ try{CONNS.forEach(c=>{try{c.open&&c.send(pkt)}catch(e){}})}catch(e){console.error("Lobby Config Sync Error: ",e)}
+ rr()}catch(e){console.error("Lobby Config Sync Error: ",e)}}
+function lcRecv(d){try{const ret=lcNorm(d?.ret,4),rtm=lcNorm(d?.rtm,2),ctx=RCX();ctx.maxRetentionsAllowed=ret;ctx.maxRtmAllowed=rtm;if(G&&typeof G==='object'){G.mxRet=ret;G.mxRtm=rtm}rr()}catch(e){console.error("Lobby Config Sync Error: ",e)}}
 let NX_T=0;
 function nxBroadcast(fmt,n,pl){try{RCX().auctionFormat=fmt;RCX().squadLimit=n;RCX().squadSizeLimit=n;if(pl!=null)RCX().auctionPoolSizeLimit=pl;clearTimeout(NX_T);NX_T=setTimeout(()=>{requestAnimationFrame(()=>{try{dispatch({k:'seasoncfg',fmt,sqn:n,pl})}catch(e){}})},120)}catch(e){}}
 function roomTitleOf(g){try{return String(g?.rn||'').trim()||('Cricket Room #'+(g?.code||''))}catch(e){return 'Cricket Room'}}
-function syncIndep(g){try{if(g&&ME&&!g.teams?.[ME]&&g.ph!=='lobby')ME=null}catch(e){}try{RCX().activeTeams=AT(g).slice();RCX().fixtures=g?.fix;RCX().auctionFormat=g?.nx?.fmt||g?.sr?.fmt||RCX().auctionFormat||null;RCX().squadLimit=g?.nx?.sqn||g?.sqn||RCX().squadLimit||null;RCX().squadSizeLimit=RCX().squadLimit;RCX().auctionPoolSizeLimit=g?.nx?.pl||g?.sr?.pl||RCX().auctionPoolSizeLimit||null}catch(e){}try{RCX().roomName=roomTitleOf(g);if(g?.rl!=null)RCX().retentionLimit=g.rl}catch(e){}try{const o=g?.oh,T=o&&g?.teams?.[o],h=T?.h,live=!!(h&&((g?.lv||[]).includes(h)||(PEER?.id&&h===PEER.id)));RCX().isIndependentSessionActive=!!(g&&o&&T&&!live)}catch(e){}}
+function syncIndep(g){try{if(g&&ME&&!g.teams?.[ME]&&g.ph!=='lobby')ME=null}catch(e){}try{RCX().activeTeams=AT(g).slice();RCX().fixtures=g?.fix;RCX().auctionFormat=g?.nx?.fmt||g?.sr?.fmt||RCX().auctionFormat||null;RCX().squadLimit=g?.nx?.sqn||g?.sqn||RCX().squadLimit||null;RCX().squadSizeLimit=RCX().squadLimit;RCX().auctionPoolSizeLimit=g?.nx?.pl||g?.sr?.pl||RCX().auctionPoolSizeLimit||null}catch(e){}try{RCX().maxRetentionsAllowed=lcRet(g);RCX().maxRtmAllowed=lcRtm(g)}catch(e){console.error("Lobby Config Sync Error: ",e)}try{RCX().roomName=roomTitleOf(g);if(g?.rl!=null)RCX().retentionLimit=g.rl}catch(e){}try{const o=g?.oh,T=o&&g?.teams?.[o],h=T?.h,live=!!(h&&((g?.lv||[]).includes(h)||(PEER?.id&&h===PEER.id)));RCX().isIndependentSessionActive=!!(g&&o&&T&&!live)}catch(e){}}
 /* every human seat that can take over: manual vice-hosts -> original host -> auto co-hosts -> any other live human player (join order) */
 function autopilotOrder(g){try{if(!g?.teams)return[];const me='ipl26-'+g.code,lv=g.lv||[],base=coOrder(g),rest=AT(g).filter(t=>{const h=g.teams[t]?.h;return h&&h!==me&&lv.includes(h)&&!base.includes(t)});return base.concat(rest)}catch(e){return[]}}
 /* tiny outbox so a tap made while the Host is gone is replayed once a host (self or other) is reachable */
@@ -730,7 +746,7 @@ try{window.addEventListener('beforeunload',()=>{if(LB.last)lbUnreg(LB.last)})}ca
 function LobbyPanel(){const[,tk]=useState(0);useEffect(()=>{const i=setInterval(()=>tk(x=>x+1),3000);return()=>clearInterval(i)},[]);const rs=lbRooms();return<div className="rounded-xl border-2 p-2 space-y-2" style={{borderColor:'#22c55e'}}><div className="font-bold text-emerald-400">🟢 Live Public Rooms <span className="text-xs text-slate-400">({rs.length})</span></div>{rs.length?rs.map(r=><div key={r.roomCode} className="flex items-center gap-2 rounded bg-slate-800 p-2 text-sm"><div className="flex-1"><b>{r.hostName}</b><div className="text-xs text-slate-400">{r.mode} · {r.playerCount}/{r.maxPlayers}</div></div><Btn c="bg-emerald-600" disabled={!(localStorage.getItem('ipl_mgr')||'').trim()} onClick={()=>join(r.roomCode)}>⚡ Join Room</Btn></div>):<div className="text-xs text-slate-400">No public rooms right now — create one!</div>}<div className="text-[10px] text-slate-500">{LB.relay?'Lobby: you are relaying':LB.c&&LB.c.open?'Lobby: connected':'Lobby: connecting…'}</div></div>}
 function onPE(code){return e=>{console.warn(e);if(HOST)return;if(['peer-unavailable','network','disconnected','server-error','socket-error','socket-closed'].includes(e.type)){LOST=!!G;LTRY++;rr();setTimeout(()=>retry(code),3000)}}}
 function conn(code){if(HOST||!PEER||(CONN&&CONN.open))return;let c;try{c=PEER.connect('ipl26-'+code,{reliable:true})}catch(e){setTimeout(()=>retry(code),3000);return}CONN=c;
- c.on('data',d=>{LRX=Date.now();if(d&&d.k==='HOST_BYE'){LOST=true;LTRY++;rr();try{c.close()}catch(e){}return}if(d&&d.k==='KICKED'){try{localStorage.removeItem('ipl_last_'+(G&&G.code));localStorage.removeItem(SK+(G&&G.code))}catch(e){}alert('You were removed from the room by the Host');home();return}if(d&&d.k==='ROOM_DISBANDED'){alert('The Host has closed the room');home();return}if(d&&d.k==='pk'){pkRecv(d,null);return}
+ c.on('data',d=>{LRX=Date.now();if(d&&d.k==='HOST_BYE'){LOST=true;LTRY++;rr();try{c.close()}catch(e){}return}if(d&&d.k==='KICKED'){try{localStorage.removeItem('ipl_last_'+(G&&G.code));localStorage.removeItem(SK+(G&&G.code))}catch(e){}alert('You were removed from the room by the Host');home();return}if(d&&d.k==='ROOM_DISBANDED'){alert('The Host has closed the room');home();return}if(d&&d.k==='pk'){pkRecv(d,null);return}if(d&&d.k==='LOBCFG'){lcRecv(d);return}
   if(d&&d.g&&typeof d.g==='object'){try{G=healRoom(d.g)}catch(e){return}LOST=false;syncIndep(G);if(Date.now()-SVT>3000){SVT=Date.now();saveRoom(G,ME)}bk();rr()}});
  c.on('open',()=>{LOST=false;LRX=Date.now();if(ME)c.send({k:'claim',t:ME,id:PEER.id,pid:DPID,u:IX.myUid()});setTimeout(flushOut,400);rr()});
  const lost=()=>{if(CONN!==c||HOST)return;LOST=true;LTRY++;rr();setTimeout(()=>{if(!HOST&&CONN===c&&!c.open)retry(code)},3000)};c.on('close',lost);c.on('error',lost)}
@@ -1071,12 +1087,12 @@ function App(){
 <div className="flex flex-wrap gap-1.5 items-center"><span>👥 Max squad</span><Btn c="bg-slate-700" onClick={()=>dispatch({k:'aucfg',sqn:LIM(G).max-1})}>−</Btn><b>{LIM(G).max}</b><Btn c="bg-slate-700" onClick={()=>dispatch({k:'aucfg',sqn:LIM(G).max+1})}>+</Btn><span className="ml-2">✈️ Max overseas</span><Btn c="bg-slate-700" onClick={()=>dispatch({k:'aucfg',osm:(G.osm||8)-1})}>−</Btn><b>{G.osm||8}</b><Btn c="bg-slate-700" onClick={()=>dispatch({k:'aucfg',osm:(G.osm||8)+1})}>+</Btn></div>
 <div className="flex flex-wrap gap-1.5 items-center"><span>💰 Purse (all teams)</span><Btn c="bg-red-700" onClick={()=>dispatch({k:'aucfg',pd:-5})}>-5 Cr</Btn><Btn c="bg-emerald-700" onClick={()=>dispatch({k:'aucfg',pd:5})}>+5 Cr</Btn></div>
 <div className="flex flex-wrap gap-1.5 items-center"><span>🔀 Set order</span><b>{aucOrder(G).join(' → ')}</b><Btn c="bg-slate-700" onClick={()=>{const o=aucOrder(G);dispatch({k:'aucfg',so:[o[1],o[2],o[0]]})}}>↻ Rotate</Btn><Btn c="bg-slate-700" onClick={()=>dispatch({k:'aucfg',so:aucOrder(G).slice().reverse()})}>⇄ Reverse</Btn></div></div>}
-<Btn c="bg-indigo-600 w-full" onClick={()=>setMd('plist')}>📋 Total Players List ({poolN(G)})</Btn><Btn c="bg-purple-600 w-full" disabled={!ME||G.cf} onClick={()=>dispatch({k:'direct'})}>⚡ Play Direct Tournament with Official IPL 2026 Squads (No Auction)</Btn><div className="flex gap-2"><Btn c="bg-emerald-600" disabled={!ME} onClick={()=>dispatch({k:'ret'})}>Start Retention / Auction</Btn><Btn c="bg-amber-600" disabled={!ME} onClick={()=>dispatch({k:'skip'})}>⚡ Skip Auction (Auto-Draft)</Btn></div></>}
-  {!HOST&&<p className="text-slate-400">Waiting for the host to start.</p>}</div></div>;
- else if(G.ph==='ret'){const T0=ME&&G.teams[ME],ros=T0?P.map((_,i)=>i).filter(i=>P[i]?.t===ME):[],ov2=rs.filter(i=>P[i]?.o==='O').length,C=[18,14,11],cost=rs.reduce((s,_,k)=>s+C[k],0);
+<LobbyRetCfg/><Btn c="bg-indigo-600 w-full" onClick={()=>setMd('plist')}>📋 Total Players List ({poolN(G)})</Btn><Btn c="bg-purple-600 w-full" disabled={!ME||G.cf} onClick={()=>dispatch({k:'direct'})}>⚡ Play Direct Tournament with Official IPL 2026 Squads (No Auction)</Btn><div className="flex gap-2"><Btn c="bg-emerald-600" disabled={!ME} onClick={()=>dispatch({k:'ret'})}>Start Retention / Auction</Btn><Btn c="bg-amber-600" disabled={!ME} onClick={()=>dispatch({k:'skip'})}>⚡ Skip Auction (Auto-Draft)</Btn></div></>}
+  {!HOST&&<><LobbyRetCfg/><p className="text-slate-400">Waiting for the host to start.</p></>}</div></div>;
+ else if(G.ph==='ret'){const T0=ME&&G.teams[ME],ros=T0?P.map((_,i)=>i).filter(i=>P[i]?.t===ME):[],ov2=rs.filter(i=>P[i]?.o==='O').length,C=lcCosts(),cap=Math.min(lcRet(G),LIM(G).max),cost=rs.reduce((s,_,k)=>s+C[k],0);
  body=<div className="p-4 max-w-xl mx-auto space-y-3"><h2 className="text-xl font-bold">Pre-Auction Retention</h2>
- {T0?<><div className="text-sm text-slate-300">Retain up to 3 (max 2 overseas): 1st ₹18 Cr, 2nd ₹14 Cr, 3rd ₹11 Cr. Purse after: ₹{120-cost} Cr · RTM cards: {3-rs.length}</div>
- <div className="grid grid-cols-2 gap-2">{ros.map(i=>{const on=rs.includes(i);return<button key={i} disabled={T0.ok||(!on&&(rs.length>=3||(P[i]?.o==='O'&&ov2>=2)))} onClick={()=>setRs(s=>on?s.filter(x=>x!==i):[...s,i])} className={`border rounded p-2 text-left text-sm disabled:opacity-40 ${on?'bg-emerald-700':''}`}>{P[i]?.n}{P[i]?.o==='O'?' ✈️':''}<div className="text-xs">{P[i]?.b}/{P[i]?.w}{on&&' · ₹'+C[rs.indexOf(i)]+' Cr'}</div></button>})}</div>
+ {T0?<><div className="text-sm text-slate-300">Retain up to {cap} (max 2 overseas): 1st ₹18 Cr, 2nd ₹14 Cr, 3rd onwards ₹11 Cr each. Purse after: ₹{120-cost} Cr · RTM cards: {lcRtm(G)}</div>
+ <div className="grid grid-cols-2 gap-2">{ros.map(i=>{const on=rs.includes(i);return<button key={i} disabled={T0.ok||(!on&&(rs.length>=cap||cost+C[rs.length]>LC_BUDGET||(P[i]?.o==='O'&&ov2>=2)))} onClick={()=>setRs(s=>on?s.filter(x=>x!==i):[...s,i])} className={`border rounded p-2 text-left text-sm disabled:opacity-40 ${on?'bg-emerald-700':''}`}>{P[i]?.n}{P[i]?.o==='O'?' ✈️':''}<div className="text-xs">{P[i]?.b}/{P[i]?.w}{on&&' · ₹'+C[rs.indexOf(i)]+' Cr'}</div></button>})}</div>
  <Btn c="bg-emerald-600" disabled={T0.ok} onClick={()=>dispatch({k:'retain',t:ME,ids:rs})}>{T0.ok?'Confirmed':'Confirm retentions'}</Btn></>:<p>Pick a franchise in the lobby first.</p>}
  <div className="text-xs text-slate-400">{AT(G).map(t=>t+(G.teams[t].ok?' ✓':G.teams[t].h?' …':' (auto)')).join(' · ')}</div>
  {HOST&&<div className="flex gap-2"><Btn c="bg-emerald-600" onClick={()=>dispatch({k:'au'})}>Start Auction →</Btn><Btn c="bg-amber-600" onClick={()=>dispatch({k:'skip'})}>⚡ Skip Auction (Auto-Draft)</Btn></div>}</div>}
@@ -1507,6 +1523,41 @@ function HubPage({go,setGm}){return<div className="vp-frame w-full p-4 max-w-md 
  <div className="rounded-xl bg-slate-800/70 p-3 w-full space-y-1"><div className="text-xs uppercase tracking-widest text-slate-400">App Info</div><div className="text-lg font-bold">{APP_VERSION} · Multiplayer · Installable App</div><div className="text-xs uppercase tracking-widest text-slate-400 mt-2">Developer</div><div className="text-2xl font-black" style={{color:'var(--acc)'}}>👨‍💻 Darshit Desani</div></div>
  <button onClick={go} className="w-full py-5 rounded-2xl text-2xl font-black text-black active:scale-95" style={{background:'linear-gradient(90deg,#f5c518,#ff9800)',boxShadow:'0 0 24px #f5c51899'}}>LET'S GO 🚀</button>
  <div className="grid grid-cols-2 gap-2 w-full"><Btn c="bg-indigo-600" onClick={()=>{if(window.__dip&&!isSA())installNow();else setGm('inst')}}>{isSA()?'✅ Installed':'📲 Install App'}</Btn><Btn c="bg-slate-700" onClick={()=>setGm('fb')}>📝 Feedback Form</Btn><a className="px-3 py-2 rounded-lg bg-green-600 font-bold text-sm flex items-center justify-center" target="_blank" rel="noopener noreferrer" href={'https://wa.me/?text='+encodeURIComponent('Play the IPL 2026 & World Cricket Auction & Match Simulator: '+location.origin+location.pathname)}>💬 WhatsApp Share</a><Btn c="bg-slate-700" onClick={()=>setGm('man')}>📄 Game Manual Guide</Btn></div></div></div>}
+
+/* v1.2.7: Pre-auction Retention / RTM allowance (Host steppers, read-only for clients) - strict 0..25 */
+function LobbyRetCfg(){
+ const[dr,setDr]=useState({ret:null,rtm:null}),[wn,setWn]=useState({ret:'',rtm:''});
+ const cur={ret:lcRet(G),rtm:lcRtm(G)},def={ret:4,rtm:2};
+ const flash=(key,msg)=>{setWn(w=>({...w,[key]:msg}));if(msg)setTimeout(()=>{try{setWn(w=>({...w,[key]:''}))}catch(e){}},3500)};
+ const commit=(key,raw,blur)=>{try{
+  let t=String(raw==null?'':raw).replace(/[^0-9-]/g,'');
+  if(t===''||t==='-'){setDr(x=>({...x,[key]:blur?null:t}));return}
+  let n=parseInt(t,10);
+  if(!isFinite(n)){setDr(x=>({...x,[key]:null}));return}
+  let msg='';
+  if(n>25){n=25;msg='⚠️ Maximum is 25 — value set to 25.'}else if(n<0){n=0;msg='⚠️ Minimum is 0 — value set to 0.'}
+  setDr(x=>({...x,[key]:null}));flash(key,msg);lcSet(key,n)
+ }catch(e){console.error("Lobby Config Sync Error: ",e)}};
+ const row=(key,icon,label,hint)=>{const v=cur[key],shown=dr[key]!=null?dr[key]:String(v);
+  return<div className="rounded-lg bg-slate-900/60 p-2 space-y-1.5" data-lobcfg={key}>
+   <div className="flex items-center justify-between gap-2"><span className="font-bold break-words min-w-0">{icon} {label}</span><span className="shrink-0 rounded-full px-2.5 py-0.5 text-xs font-black bg-amber-400 text-black border-2 border-black">{v}</span></div>
+   {HOST?<>
+    <div className="flex items-center gap-2">
+     <button type="button" aria-label={'Decrease '+label} disabled={v<=0} onClick={()=>commit(key,v-1)} className="w-10 h-10 rounded-lg bg-slate-700 text-xl font-black active:scale-95 disabled:opacity-40">−</button>
+     <input type="text" inputMode="numeric" maxLength={3} value={shown} aria-label={label} onChange={e=>commit(key,e?.target?.value,false)} onBlur={e=>commit(key,e?.target?.value,true)} className={'flex-1 min-w-0 text-center rounded-lg bg-slate-700 px-2 py-2 text-white text-lg font-black border-2 '+(wn[key]?'border-red-500':'border-transparent')}/>
+     <button type="button" aria-label={'Increase '+label} disabled={v>=25} onClick={()=>commit(key,v+1)} className="w-10 h-10 rounded-lg bg-slate-700 text-xl font-black active:scale-95 disabled:opacity-40">+</button>
+    </div>
+    <input type="range" min="0" max="25" step="1" value={v} onChange={e=>commit(key,e?.target?.value)} aria-label={label+' slider'} className="w-full accent-amber-400"/>
+    <div className="flex justify-between text-[10px] text-slate-400"><span>0</span><span>{hint}</span><span>25</span></div>
+    {wn[key]&&<div role="alert" className="text-xs font-bold text-red-400">{wn[key]}</div>}
+   </>:<div className="text-[11px] text-slate-400">{hint} · set by the Host (0–25)</div>}
+  </div>};
+ return<div className="rounded-xl border-2 border-amber-400 p-2 space-y-2 text-sm w-full max-w-full" data-keep="1">
+  <b className="text-sm">🎟️ Retention &amp; RTM Allowance {HOST?'(Host)':''}</b>
+  {row('ret','🛡️','Maximum Players Retention Allowance','retained before the auction')}
+  {row('rtm','🃏','Maximum Right-To-Match (RTM) Cards Available','cards per franchise')}
+  {G?.cf&&<div className="text-[11px] text-amber-300">Custom Franchise League always starts with 0 retentions and 0 RTM; these values apply to Official IPL League Mode.</div>}
+ </div>}
 function LobbyAdmin(){const at=AT(G),unused=TN.filter(t=>!at.includes(t));return<div className="rounded-xl border-2 border-sky-500 p-2 space-y-2 text-sm"><b>🛠️ Room Setup (Host)</b><div className="flex flex-wrap gap-2 items-center"><Btn c="bg-emerald-700" disabled={at.length>=10} onClick={()=>dispatch({k:'addteam'})}>➕ Add Team</Btn><span className="font-bold">{at.length} teams</span></div><div className="space-y-1">{at.map(t=>{const T=G.teams[t],held=!!T.h;return<div key={t} className="flex flex-wrap items-center gap-1.5 rounded bg-slate-800 p-1.5"><TeamLogo teamId={t} size={22}/><b style={{color:TC[t]}} className="mr-auto">{TDn(t)}</b>{!held&&<select value="" onChange={e=>e.target.value&&dispatch({k:'swapbrand',t,to:e.target.value})} className="bg-slate-700 rounded px-1 py-1 text-xs"><option value="">Change brand…</option>{unused.map(u=><option key={u} value={u}>{TDn(u)}</option>)}</select>}{!held&&<Btn c="bg-slate-700" disabled={at.length<=2} onClick={()=>dispatch({k:'rmteam',t})}>➖</Btn>}{held&&!(PEER&&T.h===PEER.id)&&<Btn c="bg-red-700" onClick={()=>{if(confirm('Clear this slot and free it?'))kick(t)}}>🗑️ Free Slot</Btn>}</div>})}</div><Btn c="bg-red-800 w-full" onClick={()=>{if(confirm('Abort this setup and close the room?'))disband()}}>🛑 Abort Setup / Close Room</Btn></div>}
 
 function pickPair(ts,list){try{const c={};(list||[]).forEach(r=>{const k=[r[0],r[1]].sort().join('|');c[k]=(c[k]||0)+1});let best=null,bc=1e9;for(let i=0;i<ts.length;i++)for(let j=i+1;j<ts.length;j++){const n=(c[[ts[i],ts[j]].sort().join('|')]||0)+Math.random()*.5;if(n<bc){bc=n;best=[ts[i],ts[j]]}}return best}catch(e){return null}}
