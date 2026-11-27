@@ -1015,7 +1015,7 @@ function App(){
  const link=G?location.origin+location.pathname+'?room='+G.code:'';
  const isVice=!!(G&&!HOST&&holds&&(G.vt||[]).includes(ME)),isCo=!!(G&&!HOST&&holds&&autopilotOrder(G).includes(ME));
  useEffect(()=>{if(!G||HOST||!LOST||!(isCo||isVice))return;const ord=autopilotOrder(G),idx=Math.max(0,ord.indexOf(ME)),code=G.code;const go=()=>{if(!HOST&&LOST&&G){G.xf=null;try{RCX().isIndependentSessionActive=true}catch(e){}startHost(G,ME,idx===0?6:8)}};const tm=setTimeout(()=>{if(HOST||!LOST)return;if(G.xf===ME||idx===0)go();else probeHost(code,v=>{if(v===true){try{retry(code)}catch(e){}}else go()})},G.xf===ME?600:idx===0?150:400+idx*1200);return()=>clearTimeout(tm)},[LOST,isCo,isVice,!!G,LTRY]);
- const Pb=({c='bg-slate-700',...p})=><button {...p} className={`shrink-0 whitespace-nowrap text-[10px] px-2 py-1 sm:text-xs sm:px-3 sm:py-1.5 rounded-lg font-bold active:scale-95 disabled:opacity-40 ${c}`}/>;
+ 
  try{RCX().isHost=!!HOST;RCX().isCoHost=!!(isVice||isCo)}catch(e){}
  const Top=<div className="tb w-full max-w-full overflow-x-hidden px-3 py-2" style={{background:`linear-gradient(90deg,${TC[ME]||'#0F1B3D'}77,var(--card) 70%,${TS[ME]||'#D4AF37'}55)`,borderBottom:'3px solid var(--acc)',boxShadow:'0 4px 24px '+(TC[ME]||'#F5C518')+'55'}}>
   <div className="flex items-center justify-between gap-2 w-full max-w-full">
@@ -1046,7 +1046,7 @@ function App(){
      <Pb onClick={()=>{setMd('room');setDr(false)}}>🔒 Room Management</Pb>
      <Pb onClick={()=>dispatch({k:'npcset',v:!G.npcOk,t:HOST?undefined:ME})}>🤖 NPC Engine Control: {G.npcOk?'Enabled':'Disabled'}</Pb>
      <Pb onClick={()=>dispatch({k:'pubset',v:!G.pub,t:HOST?undefined:ME})}>🌐 Room Privacy: {G.pub?'Public':'Private'}</Pb>
-     <RoomNameRow g={G}/></div>}
+     <SafeBox><RoomNameRow g={G}/></SafeBox></div>}
     <Pb style={{background:'#059669'}} onClick={()=>{if(G)setXo(true);else goPg('hub')}}>🏠 Go to Home</Pb>
     <div data-keep="1" className="flex items-center gap-2"><span className="text-xs font-bold shrink-0">🎨 Change Theme</span><select value={th} onChange={e=>setTh(e.target.value)} className="bg-slate-700 rounded-lg py-1.5 text-xs font-bold min-w-0 flex-1 truncate"><option value="aaa">🏆 AAA Official Console Cricket</option><option value="ipl">📺 Official IPL TV Broadcast</option><option value="neon">⚡ Neon Esports Stadium</option><option value="vip">👑 VIP Obsidian & Gold</option><option value="ice">❄️ Ice Blue & Platinum</option><option value="day">☀️ Daylight Cricket Pro</option><option value="espn">🤍 ESPNcricinfo / Apple Sports Clean</option><option value="sonyliv">📺 Sony LIV / JioCinema Match Center</option><option value="fut">🎮 EA Sports FC Ultimate Team HUD</option></select></div>
    </div>
@@ -1602,6 +1602,9 @@ function TeamRecord({g,t}){
   {rs.length?<div className="space-y-1 max-h-[50vh] overflow-y-auto">{rs.map((r,k)=><div key={k} className="rounded bg-slate-800 p-2 text-xs flex items-start gap-2"><span className={'px-2 py-0.5 rounded font-bold text-white whitespace-nowrap '+col(r.res)}>{r.res}</span><span className="min-w-0 break-words">vs <b>{TDn(r.opp)}</b>{r.score&&<div className="text-slate-300">{r.score}</div>}<div className="text-slate-400">{r.msg}</div></span></div>)}</div>:<p className="text-slate-400 text-xs">No matches played yet.</p>}
  </div>}
 
+const Pb=({c='bg-slate-700',...p})=><button {...p} className={`shrink-0 whitespace-nowrap text-[10px] px-2 py-1 sm:text-xs sm:px-3 sm:py-1.5 rounded-lg font-bold active:scale-95 disabled:opacity-40 ${c}`}/>;
+/* isolates a widget: a render error inside it can never take down the whole screen */
+class SafeBox extends React.Component{constructor(p){super(p);this.state={e:0}}static getDerivedStateFromError(){return{e:1}}componentDidCatch(e){try{console.error('[SafeBox]',e)}catch(x){}}render(){return this.state.e?null:this.props.children}}
 /* v1.2.7 menu helpers */
 function moveHolder(g,from,to){try{const A=g.teams[from],B=g.teams[to];if(!A||!B||from===to||!A.h)return false;if(B.h&&B.h!==A.h&&(g.lv||[]).includes(B.h))return false;
  const h=A.h;B.h=h;if(A.pid!==undefined){B.pid=A.pid;delete A.pid}if(A.u){B.u=A.u;delete A.u}A.h=null;
